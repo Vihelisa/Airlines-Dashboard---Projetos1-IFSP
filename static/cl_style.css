@@ -24,13 +24,12 @@ body {
     border-radius: 10px;
 }
 .stButton button:hover {
-    background-color: #003167; /* Azul mais escuro para o hover */
-    color: #FFFFFF;
+    background-color: #1C86EE; /* Azul mais escuro para o hover */
 }
-/*.stMarkdown a {
-    color: #1E90FF; Azul para o link 
+.stMarkdown a {
+    color: #1E90FF; /* Azul para o link */
     text-decoration: none;
 }
 .stMarkdown a:hover {
     text-decoration: underline;
-}*/
+}
