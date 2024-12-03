@@ -1,4 +1,5 @@
 import streamlit as st 
+from time import sleep
 from functions.functions import *
 
 
@@ -23,8 +24,8 @@ def create_user_window():
             # Gerar uma senha segura de 12 caracteres
             senha_gerada = generate_secure_password()
             send_email(novo_email, senha_gerada) 
-            st.success(novo_email)
-            st.success(senha_gerada) 
         else: 
             st.error("Por favor, insira um nome válido e um email válido.")
+
+    st.button("Voltar a tela de Login", on_click=lambda: change_page('login'))
 
