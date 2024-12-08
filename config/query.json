@@ -1,0 +1,3 @@
+{
+    "funcionario": "SELECT * FROM funcionario"
+}

@@ -1,0 +1,35 @@
+/* static/principal.css */
+[data-testid="stSidebar"] {
+    background-color: #1B2A49; /* Cor de fundo azul escuro */
+    color: white; /* Cor do texto */
+    transition: width 0.2s;
+    overflow-x: hidden;
+}
+[data-baseweb="tabs"] {
+    background-color: #002855; /* Cor azul para combinar com a sidebar */
+    border: none; /* Remove bordas, se houver */
+}
+/* Estilo das abas individuais */
+[data-baseweb="tab"] {
+    background-color: #002855; /* Cor azul para combinar com a sidebar */
+    color: white; /* Cor do texto */
+    border: none; /* Remove bordas */
+    padding: 10px; /* Ajuste de espaçamento */
+}
+/* Alterar cor ao passar o mouse nas abas */
+[data-baseweb="tab"]:hover {
+    background-color: #003f7f; /* Azul mais escuro para efeito hover */
+}
+
+/* Aba selecionada */
+[data-baseweb="tab"][aria-selected="true"] {
+    background-color: #004080; /* Azul específico para aba ativa */
+    font-weight: bold; /* Deixar o texto da aba selecionada em negrito */
+}
+
+/* Estilo do conteúdo da aba */
+[data-baseweb="tab-panel"] {
+    background-color: transparent; /* Fundo transparente para o conteúdo */
+    color: white; /* Cor do texto do conteúdo */
+    padding: 20px; /* Espaçamento interno */
+}
