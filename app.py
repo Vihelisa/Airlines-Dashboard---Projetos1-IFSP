@@ -13,8 +13,7 @@ from functions.functions import *
 load_css("static/style.css")
 
 #fazendo a conexão com o banco de dados
-make_conection()
-
+df_funcionario, df_empresa, df_rotas = get_query()
 # Estado inicial para controle da tela ativa 
 if 'page' not in st.session_state: 
     st.session_state.page = 'login'
