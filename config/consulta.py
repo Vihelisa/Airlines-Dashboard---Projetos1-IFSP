@@ -17,6 +17,7 @@ def connect_to_db(database, user, password, host):
         print(f"Erro ao conectar ao banco de dados:\n{e}")
         return None
 
+#teste
 
 def get_data(query):
     with open('config/login_bd.json') as file:
