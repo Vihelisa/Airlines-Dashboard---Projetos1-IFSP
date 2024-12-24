@@ -4,6 +4,56 @@ import streamlit as st
 import smtplib 
 from email.mime.text import MIMEText 
 from email.mime.multipart import MIMEMultipart
+from werkzeug.security import check_password_hash
+from werkzeug.security import generate_password_hash
+from sqlalchemy.orm import sessionmaker
+from config.consulta import connect_to_db
+from sqlalchemy.sql import text
+
+
+SQLSession = connect_to_db("dashboard", "postgres", "root", "localhost")
+
+
+def create_user(nome, email, senha):
+    try:
+        db_session = SQLSession()  # Instanciar a sessão
+
+        hashed_password = generate_password_hash(senha, method='pbkdf2:sha256', salt_length=8)
+        
+        # Envolva a consulta SQL com `text()`
+        db_session.execute(
+            text("INSERT INTO funcionario (nome, email, senha) VALUES (:nome, :email, :senha)"),
+            {"nome": nome, "email": email, "senha": hashed_password}
+        )
+        db_session.commit()
+        db_session.close()  # Sempre fechar a sessão
+        return True
+    except Exception as e:
+        print(f"Erro ao criar usuário: {e}")
+        return False
+
+
+def validate_user(email, password):
+    try:
+        db_session = SQLSession()  # Cria uma sessão usando o sessionmaker
+
+        # Declarar a consulta como texto explícito
+        query = text("SELECT email, senha FROM funcionario WHERE email = :email")
+        result = db_session.execute(query, {"email": email}).fetchone()
+
+        db_session.close()  # Sempre fechar a sessão
+
+        if result:
+            # `result` é uma tupla: (email, senha)
+            stored_email, stored_password = result
+
+            # Validar a senha
+            if check_password_hash(stored_password, password):
+                return True
+        return False
+    except Exception as e:
+        print(f"Erro ao validar usuário: {e}")
+        return False
 
 
 
@@ -53,3 +103,12 @@ def send_email(to_email, password):
         st.error(f"Erro ao enviar email: {e}")
 
     
+
+if __name__ == "__main__":
+    email_teste = "testeleo@gmail.com"
+    senha_teste = "123"
+
+    if validate_user(email_teste, senha_teste):
+        print("Usuário validado com sucesso!")
+    else:
+        print("Falha na validação do usuário.")

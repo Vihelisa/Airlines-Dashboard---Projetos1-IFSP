@@ -11,21 +11,20 @@ def load_css(file_name):
 load_css("static/cl_style.css")
 
 def create_user_window():
-    st.title("Cadastro de Novo Usuário") 
+    st.title("Cadastro de Novo Usuário")
 
-    # Campos de entrada para novo usuário 
-    novo_nome = st.text_input("Nome do novo usuário", "") 
-    novo_email = st.text_input("Insira o email do novo usuário", "") 
+    novo_nome = st.text_input("Nome do novo usuário", "")
+    novo_email = st.text_input("Insira o email do novo usuário", "")
 
-    # Botão de envio do formulário de cadastro 
-
-    if st.button("Enviar solicitação de cadastro de usuário"): 
+    if st.button("Enviar solicitação de cadastro de usuário"):
         if "@gmail.com" in novo_email:
-            # Gerar uma senha segura de 12 caracteres
             senha_gerada = generate_secure_password()
-            send_email(novo_email, senha_gerada) 
-        else: 
-            st.error("Por favor, insira um nome válido e um email válido.")
+            if create_user(novo_nome, novo_email, senha_gerada):
+                send_email(novo_email, senha_gerada)
+                st.success("Usuário cadastrado com sucesso! Verifique o email para a senha.")
+            else:
+                st.error("Erro ao cadastrar usuário!")
+        else:
+            st.error("Por favor, insira um email válido.")
 
     st.button("Voltar a tela de Login", on_click=lambda: change_page('login'))
-
