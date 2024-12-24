@@ -1,5 +1,5 @@
 {
-    "user": "root",
+    "user": "postgres",
     "password": "root",
     "database": "dashboard"
 }

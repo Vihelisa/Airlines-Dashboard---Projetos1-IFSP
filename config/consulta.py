@@ -14,13 +14,14 @@ def connect_to_db(database, user, password, host):
         engine = create_engine(connection_string)
         return engine
     except Exception as e:
-        print(f"Erro ao conectar ao banco de dados:\n{e}")
+        print(f"Erro ao conectar! Detalhes: {e}")
+
         return None
 
 #teste
 
 def get_data(query):
-    with open('config/login_bd.json') as file:
+    with open('config/login_bd.json', encoding='utf-8') as file:
         login = json.load(file)
     try:
         # Conectar ao banco de dados 
@@ -31,8 +32,9 @@ def get_data(query):
         except SQLAlchemyError as e: 
             print(f"Erro ao executar a consulta: {e}") 
             return None   
-    except:
-        print(f"Erro ao conectar!")
+    except Exception as e:
+        print(f"Erro ao conectar! Detalhes: {e}")
+
     
 
 
