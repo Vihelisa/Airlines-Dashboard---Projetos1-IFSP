@@ -14,7 +14,7 @@ from sqlalchemy.sql import text
 SQLSession = connect_to_db("dashboard", "postgres", "root", "localhost")
 
 
-def create_user(nome, email, senha):
+def create_user(nome, email, senha, empresa_nome):
     try:
         db_session = SQLSession()  # Instanciar a sessão
 
@@ -22,8 +22,12 @@ def create_user(nome, email, senha):
         
         # Envolva a consulta SQL com `text()`
         db_session.execute(
-            text("INSERT INTO funcionario (nome, email, senha) VALUES (:nome, :email, :senha)"),
-            {"nome": nome, "email": email, "senha": hashed_password}
+            text("INSERT INTO funcionario (nome, email, senha, empresa_nome) VALUES (:nome, :email, :senha, :empresa_nome)"),
+            {"nome": nome, "email": email, "senha": hashed_password, "empresa_nome": empresa_nome}
+        )
+        db_session.execute(
+            text("UPDATE funcionario SET idempresa = (SELECT e.idempresa FROM empresa AS e WHERE funcionario.empresa_nome = e.sigla) WHERE empresa_nome IN (SELECT sigla  FROM empresa) AND nome = :nome"),
+            {"nome": nome}
         )
         db_session.commit()
         db_session.close()  # Sempre fechar a sessão

@@ -15,13 +15,13 @@ def create_user_window():
 
     novo_nome = st.text_input("Nome do novo usuário", "")
     novo_email = st.text_input("Insira o email do novo usuário", "")
+    novo_empresa = st.selectbox("Empresa:", ("GLO", "AZU", "TAM"))
 
     if st.button("Enviar solicitação de cadastro de usuário"):
         if "@gmail.com" in novo_email:
             senha_gerada = generate_secure_password()
-            if create_user(novo_nome, novo_email, senha_gerada):
+            if create_user(novo_nome, novo_email, senha_gerada, novo_empresa):
                 send_email(novo_email, senha_gerada)
-                st.success("Usuário cadastrado com sucesso! Verifique o email para a senha.")
             else:
                 st.error("Erro ao cadastrar usuário!")
         else:

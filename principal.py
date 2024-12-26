@@ -12,8 +12,8 @@ from telas.tela_voos import *
 
 
 def tela_principal():
-    load_css("static/principal.css")
-    
+    load_css("static/principal.css")    
+   
     with st.sidebar:
         selected = sac.tabs( [ 
             sac.TabsItem(label='Perfil do Usuário', icon='user'), 
