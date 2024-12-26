@@ -3,9 +3,7 @@ import streamlit_antd_components as sac
 
 from functions.functions import *
 from views.perfil_user import *
-from telas.tela_aeroporto import *
-from telas.tela_empresa import *
-from telas.tela_voos import * 
+
 
 
 # Opções de navegação 
@@ -32,8 +30,30 @@ def tela_principal():
         title='Análise de Receita',
         icon=':material/whatshot:'
     )
+    efic_operac = st.Page(
+        page='views/efic_operac.py',
+        title='Eficiência Operacional',
+        icon=':material/whatshot:'
+    )
+    analise_rota = st.Page(
+        page='views/analise_rota.py',
+        title='Análise de Rota',
+        icon=':material/whatshot:'
+    )
+    analise_temporal = st.Page(
+        page='views/analise_temporal.py',
+        title='Análise de Temporal',
+        icon=':material/whatshot:'
+    )
 
-    pg = st.navigation(pages=[perfil_user, analise_trafego, analise_receita])
+    pg = st.navigation(pages=[
+        perfil_user, 
+        analise_trafego, 
+        analise_receita, 
+        efic_operac, 
+        analise_rota,
+        analise_temporal
+    ])
 
     pg.run()
     
