@@ -14,7 +14,7 @@ from sqlalchemy.sql import text
 SQLSession = connect_to_db("dashboard", "postgres", "root", "localhost")
 
 
-def create_user(nome, email, senha, empresa_nome):
+def create_user(nome, email, senha, empresa_nome, cargo):
     try:
         db_session = SQLSession()  # Instanciar a sessão
 
@@ -22,8 +22,8 @@ def create_user(nome, email, senha, empresa_nome):
         
         # Envolva a consulta SQL com `text()`
         db_session.execute(
-            text("INSERT INTO funcionario (nome, email, senha, empresa_nome) VALUES (:nome, :email, :senha, :empresa_nome)"),
-            {"nome": nome, "email": email, "senha": hashed_password, "empresa_nome": empresa_nome}
+            text("INSERT INTO funcionario (nome, email, senha, empresa_nome, cargo) VALUES (:nome, :email, :senha, :empresa_nome, :cargo)"),
+            {"nome": nome, "email": email, "senha": hashed_password, "empresa_nome": empresa_nome, "cargo": cargo}
         )
         db_session.execute(
             text("UPDATE funcionario SET idempresa = (SELECT e.idempresa FROM empresa AS e WHERE funcionario.empresa_nome = e.sigla) WHERE empresa_nome IN (SELECT sigla  FROM empresa) AND nome = :nome"),
@@ -37,27 +37,52 @@ def create_user(nome, email, senha, empresa_nome):
         return False
 
 
-def validate_user(email, password):
+def fetch_user_info(user_id):
+    """Recupera informações do usuário a partir do banco de dados."""
     try:
-        db_session = SQLSession()  # Cria uma sessão usando o sessionmaker
-
-        # Declarar a consulta como texto explícito
-        query = text("SELECT email, senha FROM funcionario WHERE email = :email")
-        result = db_session.execute(query, {"email": email}).fetchone()
-
-        db_session.close()  # Sempre fechar a sessão
+        db_session = SQLSession()
+        query = text("""
+            SELECT nome, email, cargo, empresa_nome 
+            FROM funcionario 
+            WHERE idfunc = :user_id
+        """)
+        result = db_session.execute(query, {"user_id": user_id}).fetchone()
+        db_session.close()
 
         if result:
-            # `result` é uma tupla: (email, senha)
-            stored_email, stored_password = result
+            return {
+                "nome": result[0],
+                "email": result[1],
+                "cargo": result[2],
+                "empresa": result[3],
+            }
+        else:
+            return None
+    except Exception as e:
+        print(f"Erro ao buscar informações do usuário: {e}")
+        return None
 
-            # Validar a senha
+
+def validate_user(email, password):
+    try:
+        db_session = SQLSession()
+        query = text("SELECT idfunc, email, senha FROM funcionario WHERE email = :email")
+        result = db_session.execute(query, {"email": email}).fetchone()
+        db_session.close()
+
+        if result:
+            user_id, stored_email, stored_password = result
             if check_password_hash(stored_password, password):
+                # Armazena os dados do usuário na sessão
+                st.session_state.user_id = user_id
+                st.session_state.user_email = stored_email
                 return True
         return False
     except Exception as e:
         print(f"Erro ao validar usuário: {e}")
         return False
+
+
 
 
 
