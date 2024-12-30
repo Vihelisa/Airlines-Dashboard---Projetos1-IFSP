@@ -22,3 +22,7 @@ elif st.session_state.page == 'cadastro':
     create_user_window()
 elif st.session_state.page == 'principal':
     tela_principal()
+elif st.session_state.page == 'perfil':
+    tela_perfil_user()
+elif st.session_state.page == 'alterar_senha':
+    tela_alterar_senha()

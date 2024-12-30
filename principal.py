@@ -6,7 +6,7 @@ from telas.perfil_user import *
 from telas.tela_aeroporto import *
 from telas.tela_empresa import *
 from telas.tela_voos import *
-
+from telas.tela_alterar_senha import *
 
 # Opções de navegação 
 

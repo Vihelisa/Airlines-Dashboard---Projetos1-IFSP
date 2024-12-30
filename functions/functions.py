@@ -75,15 +75,26 @@ def validate_user(email, password):
             if check_password_hash(stored_password, password):
                 # Armazena os dados do usuário na sessão
                 st.session_state.user_id = user_id
-                st.session_state.user_email = stored_email
+                st.session_state.user_email = stored_email  
                 return True
         return False
     except Exception as e:
         print(f"Erro ao validar usuário: {e}")
         return False
 
-
-
+def atualizar_senha_bd(user_id, nova_senha):
+    """Atualiza a senha do usuário no banco de dados."""
+    try:
+        db_session = SQLSession()
+        hashed_password = generate_password_hash(nova_senha, method='pbkdf2:sha256', salt_length=8)
+        query = text("UPDATE funcionario SET senha = :senha WHERE idfunc = :user_id")
+        db_session.execute(query, {"senha": hashed_password, "user_id": user_id})
+        db_session.commit()
+        db_session.close()
+        return True
+    except Exception as e:
+        print(f"Erro ao atualizar a senha: {e}")
+        return False
 
 
 def load_css(file_name):

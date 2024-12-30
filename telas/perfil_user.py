@@ -1,9 +1,6 @@
 import streamlit as st
 from functions.functions import *
 
-
-
-
 def tela_perfil_user():
     st.title("Perfil do Usuário")
 
@@ -25,7 +22,7 @@ def tela_perfil_user():
     with col1:
         # Ícone genérico de usuário
         st.image(
-            "https://cdn-icons-png.flaticon.com/512/149/149071.png",  # URL do ícone de usuário
+            "static/icons/iconeperfil.png",  # URL do ícone de usuário
             width=150,
             caption="Foto de Perfil",
         )
@@ -39,8 +36,8 @@ def tela_perfil_user():
         st.write(f"**Empresa:** {user_info['empresa']}")
 
     # Botões de ação
-    if st.button("Editar Perfil"):
-        st.info("Funcionalidade de edição ainda não implementada.")
+    if st.button("Alterar Senha"):
+        st.session_state.page = 'alterar_senha'
     if st.button("Sair"):
         st.session_state.logged_in = False
         st.session_state.page = 'login'
