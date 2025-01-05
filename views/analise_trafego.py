@@ -45,7 +45,6 @@ with col3:
     select_ano = st.multiselect("Selecione o ano", lista_ano)
 
 select_trafego, select_mes, select_ano = filter_empty_data(select_trageto, select_mes, select_ano)
-print(select_trafego, select_mes, select_ano)
 
 if not 'Todos' in select_trageto:
     lista_df_filtrado = []
