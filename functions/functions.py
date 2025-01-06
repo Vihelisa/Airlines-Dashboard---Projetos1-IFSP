@@ -4,7 +4,110 @@ import streamlit as st
 import smtplib 
 from email.mime.text import MIMEText 
 from email.mime.multipart import MIMEMultipart
+from werkzeug.security import check_password_hash
+from werkzeug.security import generate_password_hash
+from sqlalchemy.orm import sessionmaker
+from config.consulta import connect_to_db
+from sqlalchemy.sql import text
+from sqlalchemy import create_engine, Table, MetaData
 
+from config.consulta import *
+
+def bd_conect():
+    engine = connect_to_db("dashboard", "postgres", "root", "localhost")
+    # Definir o schema da tabela (sem criar, apenas referenciando) 
+    metadata = MetaData(bind=engine) 
+    db_session = Table('funcionario', metadata, autoload_with=engine)
+    return engine, db_session
+
+
+def create_user(nome, email, senha, empresa_nome, cargo):
+    print('Função create user')
+    try:
+        try:
+            engine, db_session = bd_conect()  # Instanciar a sessão
+        except:
+            print('Deu erro na conexão')
+
+        hashed_password = generate_password_hash(senha, method='pbkdf2:sha256', salt_length=8)
+        novo_usuario = {"nome": nome, "email": email, "senha": hashed_password, "empresa_nome": empresa_nome, "cargo": cargo}
+
+        try:
+            with engine.connect() as conn: 
+                ins = db_session.insert().values(novo_usuario) 
+                conn.execute(ins) 
+                print("Dados inseridos com sucesso!")
+        except:
+            print('erro ao inserir os dados')
+
+        # Envolva a consulta SQL com `text()`
+
+        '''db_session.execute(
+            text("INSERT INTO funcionario (nome, email, senha, empresa_nome, cargo) VALUES (:nome, :email, :senha, :empresa_nome, :cargo)"),
+            {"nome": nome, "email": email, "senha": hashed_password, "empresa_nome": empresa_nome, "cargo": cargo}
+        )
+        db_session.execute(
+            text("UPDATE funcionario SET idempresa = (SELECT e.idempresa FROM empresa AS e WHERE funcionario.empresa_nome = e.sigla) WHERE empresa_nome IN (SELECT sigla  FROM empresa) AND nome = :nome"),
+            {"nome": nome}
+        )
+        db_session.commit()
+        db_session.close()  # Sempre fechar a sessão'''
+        return True
+    except Exception as e:
+        print(f"Erro ao criar usuário: {e}")
+        return False
+    
+
+def fetch_user_info(user_id):
+    """Recupera informações do usuário a partir do banco de dados."""
+    try:
+        query = text("""
+            SELECT nome, email, cargo, empresa_nome 
+            FROM funcionario 
+            WHERE idfunc = :user_id
+        """)
+        db_session = bd_conect()  # Instanciar a sessão
+        result = db_session.execute(query, {"user_id": user_id}).fetchone()
+        db_session.close()
+
+        if result:
+            return {
+                "nome": result[0],
+                "email": result[1],
+                "cargo": result[2],
+                "empresa": result[3],
+            }
+        else:
+            return None
+    except Exception as e:
+        print(f"Erro ao buscar informações do usuário: {e}")
+        return None
+    
+
+def validate_user(email, password):
+    try:
+        df_funcionario, df_empresa, df_rotas = get_query()
+        user_true = df_funcionario.loc[(df_funcionario['email'] == email) & (df_funcionario['senha'] == password)]
+        if not user_true.empty:
+            print('existe')
+            return True
+    except Exception as e:
+        return False
+    
+
+def atualizar_senha_bd(user_id, nova_senha):
+    """Atualiza a senha do usuário no banco de dados."""
+    try:
+        db_session = bd_conect()  # Instanciar a sessão
+        hashed_password = generate_password_hash(nova_senha, method='pbkdf2:sha256', salt_length=8)
+        query = text("UPDATE funcionario SET senha = :senha WHERE idfunc = :user_id")
+        db_session.execute(query, {"senha": hashed_password, "user_id": user_id})
+        db_session.commit()
+        db_session.close()
+        return True
+    except Exception as e:
+        print(f"Erro ao atualizar a senha: {e}")
+        return False
 
 
 def load_css(file_name):
