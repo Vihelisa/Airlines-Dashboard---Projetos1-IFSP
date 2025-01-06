@@ -58,30 +58,15 @@ def create_user(nome, email, senha, empresa_nome, cargo):
         return False
     
 
-def fetch_user_info(user_id):
+def fetch_user_info(email, senha):
     """Recupera informações do usuário a partir do banco de dados."""
     try:
-        query = text("""
-            SELECT nome, email, cargo, empresa_nome 
-            FROM funcionario 
-            WHERE idfunc = :user_id
-        """)
-        db_session = bd_conect()  # Instanciar a sessão
-        result = db_session.execute(query, {"user_id": user_id}).fetchone()
-        db_session.close()
-
-        if result:
-            return {
-                "nome": result[0],
-                "email": result[1],
-                "cargo": result[2],
-                "empresa": result[3],
-            }
-        else:
-            return None
-    except Exception as e:
-        print(f"Erro ao buscar informações do usuário: {e}")
-        return None
+        df_funcionario, df_empresa, df_rotas = get_query()
+        user_true = df_funcionario.loc[(df_funcionario['email'] == email) & (df_funcionario['senha'] == senha)].reset_index()
+        if not user_true.empty:
+            return user_true
+    except:
+        st.error("Não foi possível carregar as informações do perfil.")
     
 
 def validate_user(email, password):

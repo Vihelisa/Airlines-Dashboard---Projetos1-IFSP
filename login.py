@@ -20,7 +20,9 @@ def tela_de_login():
                                                                    
         def on_click_login(): 
             if validate_user(usuario, senha): 
-                st.session_state.logged_in = True 
+                st.session_state.logged_in = True
+                st.session_state.email = usuario 
+                st.session_state.senha = senha
                 # Marcar o login como realizado 
                 change_page('principal') 
             else: st.error("Usuário ou senha incorretos!")
