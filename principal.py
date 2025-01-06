@@ -3,7 +3,6 @@ import streamlit_antd_components as sac
 
 from config.consulta import *
 from functions.functions import *
-from views.perfil_user import *
 
 
 #fazendo a conexão com o banco de dados
@@ -23,8 +22,7 @@ def tela_principal():
     perfil_user = st.Page(
         page='views/perfil_user.py',
         title='Perfil do usuário',
-        icon=':material/person:',
-        default=True
+        icon=':material/person:'
     )
 
     analise_trafego = st.Page(

@@ -4,13 +4,15 @@ from functions.functions import *
 
 st.title("Perfil do usuário")  
 
-
-if 'email' in st.session_state and 'senha' in st.session_state: 
-    email = st.session_state.email 
-    senha = st.session_state.senha 
-else:
-    st.error("Usuário não logado. Faça login novamente.")
-    st.session_state.page = 'login'
+try:
+    if 'email' in st.session_state and 'senha' in st.session_state: 
+        email = st.session_state.email 
+        senha = st.session_state.senha 
+    else:
+        st.error("Usuário não logado. Faça login novamente.")
+        st.session_state.page = 'login'
+except:
+    print('ainda não foi inserido')
 
 # Busca as informações do usuário
 user_info = fetch_user_info(email, senha)
