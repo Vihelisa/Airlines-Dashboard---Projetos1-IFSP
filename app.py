@@ -5,15 +5,15 @@ import streamlit as st
 from login import *
 from create_user import *
 from principal import *
-from config.consulta import *
 from functions.functions import *
+
+st.set_page_config(layout="wide")
 
 
 # Carregar o CSS
 load_css("static/style.css")
 
-#fazendo a conexão com o banco de dados
-df_funcionario, df_empresa, df_rotas = get_query()
+
 # Estado inicial para controle da tela ativa 
 if 'page' not in st.session_state: 
     st.session_state.page = 'login'

@@ -8,12 +8,25 @@ def tela_de_login():
     # Conteúdo do aplicativo Streamlit
     st.title("Airlines Dashboard")
 
-    # Campos de entrada para usuário e senha
-    usuario = st.text_input("Usuário de acesso:", "user.user@gmail.com")
-    senha = st.text_input("Senha de acesso:", "passwoard123", type="password")
+     # Verifique se o usuário já fez login
+    if 'logged_in' in st.session_state and st.session_state.logged_in:
+        # Se já estiver logado, redirecionar para a página principal
+        change_page('principal')
+        st.session_state.page = 'principal'
+    else:
+        # Caso contrário, exiba o formulário de login
+        usuario = st.text_input("Usuário de acesso:", "")
+        senha = st.text_input("Senha de acesso:", "", type="password")  
+                                                                   
+        def on_click_login(): 
+            if validate_user(usuario, senha): 
+                st.session_state.logged_in = True
+                st.session_state.email = usuario 
+                st.session_state.senha = senha
+                # Marcar o login como realizado 
+                change_page('principal') 
+            else: st.error("Usuário ou senha incorretos!")
+        
+        st.button("Entrar", on_click=on_click_login)
 
-    # Botão de login
-    st.button("Entrar", on_click=lambda: change_page('principal'))
-
-    st.button("Quero cadastrar um novo usuário", on_click=lambda: change_page('cadastro'))
-    
+        st.button("Quero cadastrar um novo usuário", on_click=lambda: change_page('cadastro'))
