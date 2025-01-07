@@ -19,14 +19,13 @@ def tela_de_login():
         senha = st.text_input("Senha de acesso:", "", type="password")  
                                                                    
         def on_click_login(): 
-            if validate_user(usuario, senha): 
-                st.session_state.logged_in = True
-                if not usuario == None and not senha == None:
-                    st.session_state.email = usuario 
-                    st.session_state.senha = senha
-                # Marcar o login como realizado 
-                change_page('principal') 
-            else: st.error("Usuário ou senha incorretos!")
+            if validate_user(usuario, senha):
+                st.session_state.logged_in = True  # Marcar o login como realizado
+                change_page('principal')
+                st.session_state.page = 'principal'
+            else:
+                st.error("Usuário ou senha incorretos!")
+
         
         st.button("Entrar", on_click=on_click_login)
 

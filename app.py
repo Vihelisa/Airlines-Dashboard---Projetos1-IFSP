@@ -1,30 +1,31 @@
 import streamlit as st
 #from streamlit_antd_components import menu
-
-
+st.set_page_config(layout="wide")
 from login import *
 from create_user import *
 from principal import *
 from functions.functions import *
+from config.consulta import *
 
-st.set_page_config(layout="wide")
+
 
 
 # Carregar o CSS
 load_css("static/style.css")
 
 
-# Estado inicial para controle da tela ativa 
-if 'page' not in st.session_state: 
+# Estado inicial para controle da tela ativa
+if 'page' not in st.session_state:
     st.session_state.page = 'login'
 
-#Página de Login
+# Controle de navegação dinâmica
 if st.session_state.page == 'login':
     tela_de_login()
-
-#Página de Cadastro
-if st.session_state.page == 'cadastro':
+elif st.session_state.page == 'cadastro':
     create_user_window()
-
-if st.session_state.page == 'principal':
+elif st.session_state.page == 'principal':
     tela_principal()
+elif st.session_state.page == 'perfil':
+    tela_perfil_user()
+elif st.session_state.page == 'alterar_senha':
+    tela_alterar_senha()

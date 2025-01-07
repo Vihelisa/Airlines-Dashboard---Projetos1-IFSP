@@ -1,6 +1,7 @@
 import streamlit as st
 import streamlit_antd_components as sac
-
+from views.perfil_user import *
+from views.tela_alterar_senha import *
 from config.consulta import *
 from functions.functions import *
 
@@ -9,7 +10,7 @@ from functions.functions import *
 df_funcionario, df_empresa, df_rotas = get_query()
 
 #filtrando a tabela de rotas para apenas a empresa TAM com id 3
-df_tam = df_rotas.loc[df_rotas['id_empresa']==3] #Só pq ainda nn tem sistema de login do usuário
+#df_tam = df_rotas.loc[df_rotas['id_empresa']==3] #Só pq ainda nn tem sistema de login do usuário
 
 
 

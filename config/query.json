@@ -1,5 +1,5 @@
 {
     "funcionario": "SELECT * FROM funcionario;",
-    "empresa": "select * from Empresa;",
+    "empresa": "select * from empresa;",
     "rotas": "select * from rotas;"
 }
