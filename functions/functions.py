@@ -141,14 +141,12 @@ def send_email(to_email, password):
         st.error(f"Erro ao enviar email: {e}")
 
     
-def filter_empty_data(select_trafego, select_mes, select_ano):
+def filter_empty_data(select_trafego, select_ano):
     if not select_trafego:
         select_trafego = 'Todos'
-    if not select_mes:
-        select_mes = 'Todos'
     if not select_ano:
         select_ano = 'Todos'
-    return select_trafego, select_mes, select_ano
+    return select_trafego, select_ano
 
 
 

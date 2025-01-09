@@ -1,13 +1,12 @@
 import streamlit as st
-#from streamlit_antd_components import menu
+st.set_page_config(layout="wide")
 
+#from streamlit_antd_components import menu
 
 from login import *
 from create_user import *
 from principal import *
 from functions.functions import *
-
-st.set_page_config(layout="wide")
 
 
 # Carregar o CSS
