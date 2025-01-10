@@ -62,7 +62,7 @@ if 'Todos' in select_trageto:
         st.write(f""" 
                 <div style="height:500px;overflow-y:scroll;"> 
                     {df_styled.to_html(escape=False)} 
-                </div> """, unsafe_allow_html=True
+                """, unsafe_allow_html=True
         )
 
         # Encontrar as linhas com o valor mais alto e mais baixo na coluna 'total_passageiros'
@@ -169,7 +169,7 @@ if 'Todos' in select_trageto:
         st.write(f""" 
                 <div style="height:500px;overflow-y:scroll;"> 
                     {df_styled.to_html(escape=False)} 
-                </div> """, unsafe_allow_html=True
+                """, unsafe_allow_html=True
         )
 
         # Encontrar as linhas com o valor mais alto e mais baixo na coluna 'total_passageiros'
@@ -280,10 +280,209 @@ elif len(select_trageto) > 0:
     if 'Todos' in select_ano:
         df_traf_todos = df_ordenado.groupby(['aeroporto_de_origem_nome', 'aeroporto_de_destino_nome']).sum().reset_index()
         df_traf_all_filtered = df_traf_todos.drop(columns=['mes', 'ano'])
-        st.dataframe(df_traf_all_filtered)
+        df_traf_all_filtered['parametro'] = info_num
+        df_traf_all_filtered['analise_de_frequencia'] = df_traf_all_filtered.apply(lambda row: 'Bom' if row['total_passageiros'] >= row['parametro'] else 'Baixo', axis=1)
+        df_styled = df_traf_all_filtered.style.applymap(colorir_celulas, subset=['analise_de_frequencia'])
+        # Exibir o DataFrame estilizado com rolagem no Streamlit 
+        st.write(f""" 
+                <div style="height:500px;overflow-y:scroll;"> 
+                    {df_styled.to_html(escape=False)} 
+                """, unsafe_allow_html=True
+        )
+        # Encontrar as linhas com o valor mais alto e mais baixo na coluna 'total_passageiros'
+        linha_valor_mais_alto = df_traf_all_filtered.loc[df_traf_all_filtered['total_passageiros'].idxmax()] 
+        linha_valor_mais_baixo = df_traf_all_filtered.loc[df_traf_all_filtered['total_passageiros'].idxmin()]
+        
+        #Tratamento do df do valor mais alto:
+        df_maior = df_trafego.loc[(df_trafego['aeroporto_de_origem_nome'] == linha_valor_mais_alto['aeroporto_de_origem_nome']) & (df_trafego['aeroporto_de_destino_nome'] == linha_valor_mais_alto['aeroporto_de_destino_nome'])]
+        df_filtro_maior = df_maior.groupby(['aeroporto_de_origem_nome', 'aeroporto_de_destino_nome', 'ano']).sum().reset_index()
+        df_filtro_maior = df_filtro_maior.drop(columns=['mes'])
+
+        #Tratamento do df do valor mais baixo:
+        df_menor = df_trafego.loc[(df_trafego['aeroporto_de_origem_nome'] == linha_valor_mais_baixo['aeroporto_de_origem_nome']) & (df_trafego['aeroporto_de_destino_nome'] == linha_valor_mais_baixo['aeroporto_de_destino_nome'])]
+        df_filtro_menor = df_menor.groupby(['aeroporto_de_origem_nome', 'aeroporto_de_destino_nome', 'ano']).sum().reset_index()
+        df_filtro_menor = df_filtro_menor.drop(columns=['mes'])
+        
+        st.write("")
+        st.write("")
+        st.write("""
+        Estes sãos os trajetos com a maior e a menos frequencia de passageiros relacionados a todos os anos analisados. Considere que o maior valor foi o trajeto mais procurado e o menor o de menos interesse dos viajantes.
+        """)
+
+
+        st.write("""#### VALOR MAIS ALTO:""")
+        st.dataframe(linha_valor_mais_alto)
+        st.dataframe(df_filtro_maior)
+
+        #####GRÁFICO 
+        # Criar o gráfico de barras 
+        fig1 = go.Figure() 
+        # Adicionar barras para total_passageiros 
+        fig1.add_trace(go.Bar(x=df_filtro_maior['ano'], y=df_filtro_maior['total_passageiros'], 
+                             name='Total Passageiros', 
+                             marker_color='blue',
+                             text=df_filtro_maior['total_passageiros'],
+                             textposition='auto')) 
+        # Adicionar barras para passageiros_pagos 
+        fig1.add_trace(go.Bar(x=df_filtro_maior['ano'], y=df_filtro_maior['passageiros_pagos'], 
+                             name='Passageiros Pagos', 
+                             marker_color='green',
+                             text=df_filtro_maior['passageiros_pagos'],
+                             textposition='auto')) 
+        # Adicionar barras para passageiros_gratis 
+        fig1.add_trace(go.Bar(x=df_filtro_maior['ano'], y=df_filtro_maior['passageiros_gratis'], 
+                             name='Passageiros Grátis', 
+                             marker_color='red',
+                             text=df_filtro_maior['passageiros_gratis'],
+                             textposition='auto'))
+        # Ajustar layout 
+        fig1.update_layout( 
+            title='Gráfico de Total Passageiros, Passageiros Pagos e Passageiros Grátis por Ano para o trageto com a maior análise', 
+            xaxis=dict(title='Ano'), 
+            yaxis=dict(title='Quantidade de Passageiros'), 
+            barmode='group' # Agrupar barras lado a lado 
+        )
+        # Exibir o gráfico no Streamlit 
+        st.plotly_chart(fig1, key='grafico1')
+
+        st.write("")
+        st.write("""#### VALOR MAIS BAIXO:""")
+        st.dataframe(linha_valor_mais_baixo)
+        st.dataframe(df_filtro_menor)
+
+        #####GRÁFICO 
+        # Criar o gráfico de barras 
+        fig2 = go.Figure() 
+        # Adicionar barras para total_passageiros 
+        fig2.add_trace(go.Bar(x=df_filtro_menor['ano'], y=df_filtro_menor['total_passageiros'], 
+                             name='Total Passageiros', 
+                             marker_color='blue',
+                             text=df_filtro_menor['total_passageiros'],
+                             textposition='auto')) 
+        # Adicionar barras para passageiros_pagos 
+        fig2.add_trace(go.Bar(x=df_filtro_menor['ano'], y=df_filtro_menor['passageiros_pagos'], 
+                             name='Passageiros Pagos', 
+                             marker_color='green',
+                             text=df_filtro_menor['passageiros_pagos'],
+                             textposition='auto')) 
+        # Adicionar barras para passageiros_gratis 
+        fig2.add_trace(go.Bar(x=df_filtro_menor['ano'], y=df_filtro_menor['passageiros_gratis'], 
+                             name='Passageiros Grátis', 
+                             marker_color='red',
+                             text=df_filtro_menor['passageiros_gratis'],
+                             textposition='auto'))
+        # Ajustar layout 
+        fig2.update_layout( 
+            title='Gráfico de Total Passageiros, Passageiros Pagos e Passageiros Grátis por Ano para o trageto com a maior análise', 
+            xaxis=dict(title='Ano'), 
+            yaxis=dict(title='Quantidade de Passageiros'), 
+            barmode='group' # Agrupar barras lado a lado 
+        )
+        # Exibir o gráfico no Streamlit 
+        st.plotly_chart(fig2, key='grafico2')
+
     else:
         select_ano = [int(item) for item in select_ano]
         df_traf_todos = df_ordenado.groupby(['aeroporto_de_origem_nome', 'aeroporto_de_destino_nome', 'ano', 'mes']).sum().reset_index()
         df_traf_all_filtered = df_traf_todos[df_traf_todos['ano'].isin(select_ano)]
-        st.dataframe(df_traf_all_filtered)
+        df_traf_all_filtered['parametro'] = info_num
+        df_traf_all_filtered['analise_de_frequencia'] = df_traf_all_filtered.apply(lambda row: 'Bom' if row['total_passageiros'] >= row['parametro'] else 'Baixo', axis=1)
+        df_styled = df_traf_all_filtered.style.applymap(colorir_celulas, subset=['analise_de_frequencia'])
+        # Exibir o DataFrame estilizado com rolagem no Streamlit 
+        st.write(f""" 
+                <div style="height:500px;overflow-y:scroll;"> 
+                    {df_styled.to_html(escape=False)} 
+                """, unsafe_allow_html=True
+        )
     
+        # Encontrar as linhas com o valor mais alto e mais baixo na coluna 'total_passageiros'
+        linha_valor_mais_alto = df_traf_all_filtered.loc[df_traf_all_filtered['total_passageiros'].idxmax()] 
+        linha_valor_mais_baixo = df_traf_all_filtered.loc[df_traf_all_filtered['total_passageiros'].idxmin()]
+
+        #Tratamento do df do valor mais alto:
+        df_maior = df_trafego.loc[(df_trafego['aeroporto_de_origem_nome'] == linha_valor_mais_alto['aeroporto_de_origem_nome']) & (df_trafego['aeroporto_de_destino_nome'] == linha_valor_mais_alto['aeroporto_de_destino_nome'])]
+        df_filtro_maior = df_maior.groupby(['aeroporto_de_origem_nome', 'aeroporto_de_destino_nome', 'mes', 'ano']).sum().reset_index()
+        df_filtro_maior = df_filtro_maior[df_filtro_maior['ano'].isin(select_ano)]
+
+        #Tratamento do df do valor mais baixo:
+        df_menor = df_trafego.loc[(df_trafego['aeroporto_de_origem_nome'] == linha_valor_mais_baixo['aeroporto_de_origem_nome']) & (df_trafego['aeroporto_de_destino_nome'] == linha_valor_mais_baixo['aeroporto_de_destino_nome'])]
+        df_filtro_menor = df_menor.groupby(['aeroporto_de_origem_nome', 'aeroporto_de_destino_nome', 'mes', 'ano']).sum().reset_index()
+        df_filtro_menor = df_filtro_menor[df_filtro_menor['ano'].isin(select_ano)]
+
+        st.write("")
+        st.write("")
+        st.write("""
+        Estes sãos os trajetos com a maior e a menos frequencia de passageiros relacionados a todos os anos analisados. Considere que o maior valor foi o trajeto mais procurado e o menor o de menos interesse dos viajantes.
+        """)
+
+
+        st.write("""#### VALOR MAIS ALTO:""")
+        st.dataframe(linha_valor_mais_alto)
+        st.dataframe(df_filtro_maior)
+
+        #####GRÁFICO 
+        # Criar o gráfico de barras 
+        fig = go.Figure() 
+        # Adicionar barras para total_passageiros 
+        fig.add_trace(go.Bar(x=df_filtro_maior['mes'], y=df_filtro_maior['total_passageiros'], 
+                             name='Total Passageiros', 
+                             marker_color='blue',
+                             text=df_filtro_maior['total_passageiros'],
+                             textposition='auto')) 
+        # Adicionar barras para passageiros_pagos 
+        fig.add_trace(go.Bar(x=df_filtro_maior['mes'], y=df_filtro_maior['passageiros_pagos'], 
+                             name='Passageiros Pagos', 
+                             marker_color='green',
+                             text=df_filtro_maior['passageiros_pagos'],
+                             textposition='auto')) 
+        # Adicionar barras para passageiros_gratis 
+        fig.add_trace(go.Bar(x=df_filtro_maior['mes'], y=df_filtro_maior['passageiros_gratis'], 
+                             name='Passageiros Grátis', 
+                             marker_color='red',
+                             text=df_filtro_maior['passageiros_gratis'],
+                             textposition='auto'))
+        # Ajustar layout 
+        fig.update_layout( 
+            title='Gráfico de Total Passageiros, Passageiros Pagos e Passageiros Grátis por Ano para o trageto com a maior análise', 
+            xaxis=dict(title='Ano'), 
+            yaxis=dict(title='Quantidade de Passageiros'), 
+            barmode='group' # Agrupar barras lado a lado 
+        )
+        # Exibir o gráfico no Streamlit 
+        st.plotly_chart(fig, key='grafico1')
+
+        st.write("")
+        st.write("""#### VALOR MAIS BAIXO:""")
+        st.dataframe(linha_valor_mais_baixo)
+        st.dataframe(df_filtro_menor)
+
+        #####GRÁFICO 
+        # Criar o gráfico de barras 
+        fig = go.Figure() 
+        # Adicionar barras para total_passageiros 
+        fig.add_trace(go.Bar(x=df_filtro_menor['mes'], y=df_filtro_menor['total_passageiros'], 
+                             name='Total Passageiros', 
+                             marker_color='blue',
+                             text=df_filtro_menor['total_passageiros'],
+                             textposition='auto')) 
+        # Adicionar barras para passageiros_pagos 
+        fig.add_trace(go.Bar(x=df_filtro_menor['mes'], y=df_filtro_menor['passageiros_pagos'], 
+                             name='Passageiros Pagos', 
+                             marker_color='green',
+                             text=df_filtro_menor['passageiros_pagos'],
+                             textposition='auto')) 
+        # Adicionar barras para passageiros_gratis 
+        fig.add_trace(go.Bar(x=df_filtro_menor['mes'], y=df_filtro_menor['passageiros_gratis'], 
+                             name='Passageiros Grátis', 
+                             marker_color='red',
+                             text=df_filtro_menor['passageiros_gratis'],
+                             textposition='auto'))
+        # Ajustar layout 
+        fig.update_layout( 
+            title='Gráfico de Total Passageiros, Passageiros Pagos e Passageiros Grátis por Ano para o trageto com a maior análise', 
+            xaxis=dict(title='Ano'), 
+            yaxis=dict(title='Quantidade de Passageiros'), 
+            barmode='group' # Agrupar barras lado a lado 
+        )
+        # Exibir o gráfico no Streamlit 
+        st.plotly_chart(fig, key='grafico2')
