@@ -52,7 +52,7 @@ def fetch_user_info(user_id):
     try:
         db_session = SQLSession()
         query = text("""
-            SELECT nome, email, cargo, empresa_nome 
+            SELECT nome, email, cargo, empresa_nome, id_empresa 
             FROM funcionario 
             WHERE idfunc = :user_id
         """)
@@ -65,6 +65,7 @@ def fetch_user_info(user_id):
                 "email": result[1],
                 "cargo": result[2],
                 "empresa": result[3],
+                "id_empresa": result[4],
             }
         else:
             return None

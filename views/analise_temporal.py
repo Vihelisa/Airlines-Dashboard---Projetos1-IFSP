@@ -1,6 +1,6 @@
 import streamlit as st
 
-from app import df_rotas, df_tam
+from app import df_rotas#, df_tam
 
 
 st.write("""

@@ -41,3 +41,5 @@ def tela_perfil_user():
     if st.button("Sair"):
         st.session_state.logged_in = False
         st.session_state.page = 'login'
+
+tela_perfil_user()

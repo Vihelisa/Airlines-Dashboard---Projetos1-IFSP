@@ -51,7 +51,7 @@ def get_data(query):
         print(f"Erro ao conectar!")
 
 def get_data_leo(query):
-    with open('config/login_bd.json', encoding='utf-8') as file:
+    with open('config/login_bd_leo.json', encoding='utf-8') as file:
         login = json.load(file)
     try:
         # Obter o objeto sessionmaker

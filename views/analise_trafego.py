@@ -10,6 +10,8 @@ st.write("""
 ## Volume de Passageiros
 Análise do número total de passageiros por rota e período de mês e ano.
 """)
+
+'''
 #filtrando dataframe para usar na tela
 lista = ['mes', 'ano', 'aeroporto_de_origem_nome', 'aeroporto_de_destino_nome', 'passageiros_pagos', 'passageiros_gratis']
 df_trafego = df_tam[lista]
@@ -112,3 +114,4 @@ else:
         AgGrid(df_graph)#Tabela de valores
     
 
+'''
