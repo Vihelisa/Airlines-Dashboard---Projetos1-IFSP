@@ -7,7 +7,7 @@ from functions.functions import *
 
 
 #fazendo a conexão com o banco de dados
-df_funcionario, df_empresa, df_rotas = get_query()
+#df_funcionario, df_empresa, df_rotas = get_query()
 
 #filtrando a tabela de rotas para apenas a empresa TAM com id 3
 #df_tam = df_rotas.loc[df_rotas['id_empresa']==3] #Só pq ainda nn tem sistema de login do usuário
@@ -52,6 +52,12 @@ def tela_principal():
         title='Análise de Temporal',
         icon=':material/whatshot:'
     )
+    analise_desempeho = st.Page(
+        page='views/analise_desempenho.py',
+        title ='Análise de Desempenho',
+        icon=':material/whatshot:'
+    )
+
 
     pg = st.navigation(pages=[
         perfil_user, 
@@ -59,7 +65,8 @@ def tela_principal():
         analise_receita, 
         efic_operac, 
         analise_rota,
-        analise_temporal
+        analise_temporal,
+        analise_desempeho
     ])
 
     pg.run()
