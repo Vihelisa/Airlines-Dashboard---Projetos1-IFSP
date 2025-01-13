@@ -26,11 +26,10 @@ for num in range(len(lista_aerop_origem)):
     lista_trageto.append(trageto)
 
 #Filtrando e criando lista para o multiselect de mes e ano
+todos = ['Todos']
 df_traf_ano = df_trafego.groupby(['ano']).sum().reset_index()
-lista_ano = df_traf_ano['ano'].to_list()
-lista_ano.append('Todos')
-"""lista_ano = list(df_traf_ano['ano'].unique()) 
-lista_ano.insert(0, 'Todos')"""
+list_ano = df_traf_ano['ano'].to_list()
+lista_ano = todos + list_ano
 
 
 # Definir as colunas 
