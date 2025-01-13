@@ -21,7 +21,7 @@ anos = df_lucratividade['ano'].to_list()
 ano_list = lista_ano + anos
 ano_selecionado = st.selectbox('Selecione o Ano', ano_list) # Filtrar dados pelo ano selecionado df_ano = df[df['Ano'] == ano_selecionado]
 
-df_ano = df_lucratividade[df_lucratividade['Ano'] == ano_selecionado]
+df_ano = df_lucratividade[df_lucratividade['ano'] == ano_selecionado]
 
 # Plotar gráficos 
 fig, ax = plt.subplots(2, 1, figsize=(10, 8)) 

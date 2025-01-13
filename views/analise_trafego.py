@@ -3,7 +3,8 @@ from streamlit_echarts import st_echarts
 from st_aggrid import AgGrid
 import plotly.graph_objs as go
 
-from principal import *
+from principal import df_tam
+from functions.functions import *
 
 
 st.write("""
