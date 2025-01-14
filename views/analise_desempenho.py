@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from config.consulta import get_query_leo
-from functions.functions import fetch_user_info
+from functions.functions import *
 import altair as alt
 
 
@@ -79,12 +79,14 @@ def tela_analise_desempenho():
 
     # Filtros
     st.subheader("Filtros")
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
 
     with col1:
         filtro_rota = st.selectbox("Rota", options=["Todas"] + list(df_agrupado['Rota'].unique()))
     with col2:
         filtro_ano = st.selectbox("Ano", options=["Todos"] + sorted(df_agrupado['Ano'].unique()))
+    with col3:
+        filtro_desgaste = st.selectbox("Desgaste", options=["Todos"] + sorted(df_agrupado['Nível de Desgaste'].unique()))
 
     # Aplicando filtros
     df_filtrado = df_agrupado.copy()
@@ -93,14 +95,23 @@ def tela_analise_desempenho():
         df_filtrado = df_filtrado[df_filtrado['Rota'] == filtro_rota]
     if filtro_ano != "Todos":
         df_filtrado = df_filtrado[df_filtrado['Ano'] == filtro_ano]
+    if filtro_desgaste != "Todos":
+        df_filtrado = df_filtrado[df_filtrado["Nível de Desgaste"] == filtro_desgaste]
 
-    # Exibindo tabela filtrada
+# Exibindo a tabela filtrada com estilo
     st.subheader("Tabela de Dados de Desempenho")
     if not df_filtrado.empty:
-        st.dataframe(df_filtrado, use_container_width=True)
+        numeric_columns = ['Total de Horas Voadas', 'Voos', 'Distância Voada Total (Km)']  
+        styled_df = (
+            df_filtrado.style
+            .format({col: "{:,.0f}" for col in numeric_columns})  
+            .applymap(estilo_desgaste, subset=['Nível de Desgaste'])  
+        )   
+
+        st.dataframe(styled_df, use_container_width=True)
     else:
         st.warning("Não há dados disponíveis para os filtros selecionados.")
-        return
+
 
     # Identificando a rota com maior número de horas voadas
     rota_top = df_filtrado.loc[df_filtrado['Total de Horas Voadas'].idxmax()]['Rota']
@@ -115,7 +126,7 @@ def tela_analise_desempenho():
     df_mensal['MesAno'] = df_mensal['mes'].astype(str).str.zfill(2) + "-" + df_mensal['ano'].astype(str)
 
 # Exibindo o DataFrame mensal para verificar os dados
-    st.subheader("Dados Mensais Originais")
+    st.subheader("Detalhamento da rota mais desgastante")
     st.dataframe(df_mensal, use_container_width=True)
 
 # Selecionando as colunas relevantes diretamente de df_mensal
@@ -129,12 +140,12 @@ def tela_analise_desempenho():
         alt.Chart(df_top5)
         .mark_bar()
         .encode(
-            x=alt.X('MesAno:N', sort=None, title='MêsAno'),  # Garantindo que o eixo X seja categórico
+            x=alt.X('MesAno:N', sort=None, title='Mês-Ano'),  # Garantindo que o eixo X seja categórico
             y=alt.Y('horas_voadas:Q', title='Horas Voadas'),
             tooltip=['MesAno', 'horas_voadas']
     )
         .properties(
-            title=f"Top 5 Meses com Maior Número de Horas Voadas",
+            title=f"Top Meses com Maior Número de Horas Voadas",
             width=600,
             height=400
     )

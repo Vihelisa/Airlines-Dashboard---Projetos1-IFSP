@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from config.consulta import *
-from functions.functions import fetch_user_info
+from functions.functions import *
 import plotly.express as px
 
 
@@ -96,18 +96,6 @@ def tela_eficiencia_operacional():
 
     df_rotas['resultado_ocupacao'] = df_rotas['porcentagem'].str.rstrip('%').astype(float).apply(classificar_ocupacao)
 
-    # Criando função para estilizar as células com base na eficiência
-    def estilo_eficiencia(val):
-        if val == "Péssima":
-            return "background-color: red; color: white;"
-        elif val == "Ruim":
-            return "background-color: yellow; color: black;"
-        elif val == "Boa":
-            return "background-color: green; color: white;"
-        elif val == "Excelente":
-            return "background-color: lightgreen; color: black;"
-        return ""
-
     # Criando os filtros lado a lado
     st.subheader("Filtros")
     col1, col2, col3, col4, col5 = st.columns(5)
@@ -126,7 +114,7 @@ def tela_eficiencia_operacional():
                                          options=["Todos"] + sorted(df_rotas['mes'].dropna().unique()))   
     with col5:
         filtro_eficiencia = st.selectbox("Eficiência", 
-                                         options=["Todos", "Ruim", "Média", "Boa", "Excelente"])
+                                         options=["Todos", "Péssima", "Ruim", "Boa", "Excelente"])
  
 
     # Aplicando os filtros ao DataFrame

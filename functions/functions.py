@@ -73,6 +73,33 @@ def fetch_user_info(user_id):
         print(f"Erro ao buscar informações do usuário: {e}")
         return None
     
+
+    # Criando função para estilizar as células com base na eficiência
+def estilo_eficiencia(val):
+    if val == "Péssima":
+        return "background-color: red; color: white;"
+    elif val == "Ruim":
+        return "background-color: yellow; color: black;"
+    elif val == "Boa":
+        return "background-color: green; color: white;"
+    elif val == "Excelente":
+        return "background-color: lightgreen; color: black;"
+    return ""
+
+
+def estilo_desgaste(val):
+    if val == "Extremo":
+        return "background-color: red; color: white;"
+    elif val == "Alto":
+        return "background-color: yellow; color: black;"
+    elif val == "Médio":
+        return "background-color: green; color: white;"
+    elif val == "Baixo":
+        return "background-color: lightgreen; color: black;"
+    return ""
+
+
+
 def validate_user(email, password):
     try:
         db_session = SQLSession()
