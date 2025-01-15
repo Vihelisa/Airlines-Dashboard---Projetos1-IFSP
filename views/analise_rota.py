@@ -7,168 +7,102 @@ def colorir_celulas(val):
     color = 'green' if val == 'Alta' else 'red' 
     return f'background-color: {color}'
 
+def colorir_celulas2(val): 
+    color = 'green' if val == 'Bom' else 'red' 
+    return f'background-color: {color}'
 
-st.write("""
-# Análise de Rota
-## Desempenho de Rotas
-Comparação entre diferentes rotas para identificar as mais e menos lucrativas. 
-###### Para calcular a lucratividade é preciso dividir o RPK pela ASK e pegar como base 1 para saber se é alta ou baixa, ou seja, a cima de 1 é alta se não é baixa.
-""")
-df_tam.loc[:, 'coef_lucratividade'] = df_tam['rpk']/df_tam['ask']
-df_lucratividade = df_tam[['aeroporto_de_origem_nome', 'aeroporto_de_destino_nome', 'mes', 'ano', 'coef_lucratividade']]
-df_lucratividade = df_lucratividade.groupby(['aeroporto_de_origem_nome', 'aeroporto_de_destino_nome', 'ano']).sum().reset_index()
-df_lucratividade.loc[:, 'lucratividade'] = df_lucratividade['coef_lucratividade'].apply(lambda x: 'Alta' if x >= 1 else 'Baixa')
-df_lucratividade = df_lucratividade.drop(columns=['mes'])
-df_styled = df_lucratividade.style.applymap(colorir_celulas, subset=['lucratividade'])
-#st.dataframe(df_styled.data)
-# Exibir o DataFrame estilizado com rolagem no Streamlit 
-st.write(f""" 
-        <div style="height:500px;overflow-y:scroll;"> 
-            {df_styled.to_html(escape=False)} 
-        """, unsafe_allow_html=True
-)
-
-
-# Selecionar ano 
-lista_ano = ['Todos']
-df_traf_ano = df_lucratividade.groupby(['ano']).sum().reset_index()
-anos = df_traf_ano['ano'].astype(str).to_list()
-ano_list = lista_ano + anos
-
-st.write("")
-st.write("")
-ano_selecionado = st.selectbox('Selecione o Ano', ano_list) # Filtrar dados pelo ano selecionado df_ano = df[df['Ano'] == ano_selecionado]
-
-if 'Todos' in ano_selecionado:
-    df_lucrat_filter = df_lucratividade.groupby(['aeroporto_de_origem_nome', 'aeroporto_de_destino_nome', 'lucratividade']).sum().reset_index()
-    df_lucrat_filter = df_lucrat_filter.drop(columns=['ano'])
-    # Encontrar as linhas com o valor mais alto e mais baixo na coluna 'total_passageiros'
-    linha_valor_mais_alto = df_lucrat_filter.loc[df_lucrat_filter['coef_lucratividade'].idxmax()] 
-    linha_valor_mais_baixo = df_lucrat_filter.loc[df_lucrat_filter['coef_lucratividade'].idxmin()]
-        
-    #Tratamento do df do valor mais alto:
-    df_maior = df_lucratividade.loc[(df_lucratividade['aeroporto_de_origem_nome'] == linha_valor_mais_alto['aeroporto_de_origem_nome']) & (df_lucratividade['aeroporto_de_destino_nome'] == linha_valor_mais_alto['aeroporto_de_destino_nome'])]
-    df_filtro_maior = df_maior.groupby(['aeroporto_de_origem_nome', 'aeroporto_de_destino_nome', 'ano']).sum().reset_index()
-    df_filtro_maior['coef_lucratividade'] = df_filtro_maior['coef_lucratividade'].round(2)
-
-    #Tratamento do df do valor mais baixo:
-    df_menor = df_lucratividade.loc[(df_lucratividade['aeroporto_de_origem_nome'] == linha_valor_mais_baixo['aeroporto_de_origem_nome']) & (df_lucratividade['aeroporto_de_destino_nome'] == linha_valor_mais_baixo['aeroporto_de_destino_nome'])]
-    df_filtro_menor = df_menor.groupby(['aeroporto_de_origem_nome', 'aeroporto_de_destino_nome', 'ano']).sum().reset_index()
-    df_filtro_menor['coef_lucratividade'] = df_filtro_menor['coef_lucratividade'].round(2)
-
-
-    # Definir as colunas 
-    col1, col2 = st.columns(2)
-
-    # Adicionar os widgets multiselect em colunas separadas 
-    with col1: 
-        st.write("")
-        st.write("")
-        st.write("Dados do trajeto com a maior lucratividade pela alta procura dos passajeitos")
-        st.dataframe(linha_valor_mais_alto)
-        st.dataframe(df_filtro_maior)
-    with col2: 
-        st.write("")
-        st.write("")
-        st.write("Dados do trajeto com a menor lucratividade devida a baixa procura dos passajeitos")
-        st.dataframe(linha_valor_mais_baixo)
-        st.dataframe(df_filtro_menor)
-
-    trajeto_maior = df_filtro_maior['aeroporto_de_origem_nome'] + '-' + df_filtro_maior['aeroporto_de_destino_nome']
-    trajeto_menor = df_filtro_menor['aeroporto_de_origem_nome']+ '-' + df_filtro_menor['aeroporto_de_destino_nome']
-    
-    fig = go.Figure() 
-    # Adicionar barras para total_passageiros 
-    fig.add_trace(go.Bar(x=df_filtro_maior['ano'], y=df_filtro_maior['coef_lucratividade'], 
-                            name='Maior lucartividade', 
-                            marker_color='green',
-                            text=df_filtro_maior['coef_lucratividade'],
-                            textposition='auto')) 
-    # Adicionar barras para passageiros_pagos 
-    fig.add_trace(go.Bar(x=df_filtro_menor['ano'], y=df_filtro_menor['coef_lucratividade'], 
-                            name='Menor lucratividade',
-                            marker_color='red',
-                            text=df_filtro_menor['coef_lucratividade'],
-                            textposition='auto')) 
-
-    # Ajustar layout 
-    fig.update_layout( 
-        title='Gráfico da comparação entre o trecho de maior e menor lucratividade', 
-        xaxis=dict(title='Ano'), 
-        yaxis=dict(title='Lucratividade'), 
-        barmode='group' # Agrupar barras lado a lado 
-    )
-    # Exibir o gráfico no Streamlit 
-    st.plotly_chart(fig)
-
-elif len(ano_selecionado) > 0:
-    select_ano = [int(ano_selecionado)]
-    df_lucratividade_groupby_mes = df_tam[['aeroporto_de_origem_nome', 'aeroporto_de_destino_nome', 'mes', 'ano', 'coef_lucratividade']]
-    df_lucratividade_mes = df_lucratividade_groupby_mes.groupby(['aeroporto_de_origem_nome', 'aeroporto_de_destino_nome', 'mes', 'ano']).sum().reset_index()
-    df_lucratividade_mes.loc[:, 'lucratividade'] = df_lucratividade_mes['coef_lucratividade'].apply(lambda x: 'Alta' if x >= 1 else 'Baixa')
-
-    df_lucrat_filter = df_lucratividade_mes[df_lucratividade_mes['ano'].isin(select_ano)]
-
-    
-    # Encontrar as linhas com o valor mais alto e mais baixo na coluna 'total_passageiros'
-    linha_valor_mais_alto = df_lucrat_filter.loc[df_lucrat_filter['coef_lucratividade'].idxmax()] 
-    linha_valor_mais_baixo = df_lucrat_filter.loc[df_lucrat_filter['coef_lucratividade'].idxmin()]
-        
-    #Tratamento do df do valor mais alto:
-    df_maior = df_lucrat_filter.loc[(df_lucrat_filter['aeroporto_de_origem_nome'] == linha_valor_mais_alto['aeroporto_de_origem_nome']) & (df_lucrat_filter['aeroporto_de_destino_nome'] == linha_valor_mais_alto['aeroporto_de_destino_nome'])]
-    df_filtro_maior = df_maior.groupby(['aeroporto_de_origem_nome', 'aeroporto_de_destino_nome', 'mes', 'ano']).sum().reset_index()
-    df_filtro_maior['coef_lucratividade'] = df_filtro_maior['coef_lucratividade'].round(2)
-
-    #Tratamento do df do valor mais baixo:
-    df_menor = df_lucrat_filter.loc[(df_lucrat_filter['aeroporto_de_origem_nome'] == linha_valor_mais_baixo['aeroporto_de_origem_nome']) & (df_lucrat_filter['aeroporto_de_destino_nome'] == linha_valor_mais_baixo['aeroporto_de_destino_nome'])]
-    df_filtro_menor = df_menor.groupby(['aeroporto_de_origem_nome', 'aeroporto_de_destino_nome', 'mes', 'ano']).sum().reset_index()
-    df_filtro_menor['coef_lucratividade'] = df_filtro_menor['coef_lucratividade'].round(2)
-
-    # Definir as colunas 
-    col1, col2 = st.columns(2)
-
-    # Adicionar os widgets multiselect em colunas separadas 
-    with col1: 
-        st.write("")
-        st.write("")
-        st.write("Dados do trajeto com a maior lucratividade pela alta procura dos passajeitos")
-        st.dataframe(linha_valor_mais_alto)
-        st.dataframe(df_filtro_maior)
-    with col2: 
-        st.write("")
-        st.write("")
-        st.write("Dados do trajeto com a menor lucratividade devida a baixa procura dos passajeitos")
-        st.dataframe(linha_valor_mais_baixo)
-        st.dataframe(df_filtro_menor)
-
-    trajeto_maior = df_filtro_maior['aeroporto_de_origem_nome'] + '-' + df_filtro_maior['aeroporto_de_destino_nome']
-    trajeto_menor = df_filtro_menor['aeroporto_de_origem_nome']+ '-' + df_filtro_menor['aeroporto_de_destino_nome']
-    
-    fig = go.Figure() 
-    # Adicionar barras para total_passageiros 
-    fig.add_trace(go.Bar(x=df_filtro_maior['mes'], y=df_filtro_maior['coef_lucratividade'], 
-                            name='Maior lucartividade', 
-                            marker_color='green',
-                            text=df_filtro_maior['coef_lucratividade'],
-                            textposition='auto')) 
-    # Adicionar barras para passageiros_pagos 
-    fig.add_trace(go.Bar(x=df_filtro_menor['mes'], y=df_filtro_menor['coef_lucratividade'], 
-                            name='Menor lucratividade',
-                            marker_color='red',
-                            text=df_filtro_menor['coef_lucratividade'],
-                            textposition='auto')) 
-
-    # Ajustar layout 
-    fig.update_layout( 
-        title='Gráfico da comparação entre o trecho de maior e menor lucratividade', 
-        xaxis=dict(title='Mês'), 
-        yaxis=dict(title='Lucratividade'), 
-        barmode='group' # Agrupar barras lado a lado 
-    )
-    # Exibir o gráfico no Streamlit 
-    st.plotly_chart(fig)
 
 st.write("""
 ## Distância Voada
 Avaliação da distância média voada por rota e análise de possíveis otimizações.
 """)
+
+df_distancia = df_tam[['aeroporto_de_origem_nome', 'aeroporto_de_destino_nome', 'mes', 'ano', 'distancia_voada_km', 'decolagens', 'horas_voadas']]
+df_distancia_groupby = df_distancia.groupby(['aeroporto_de_origem_nome', 'aeroporto_de_destino_nome', 'ano']).agg({
+    'distancia_voada_km': 'mean',
+    'decolagens': 'mean',
+    'horas_voadas': 'mean'
+}).reset_index()
+
+lista_aerop_origem = df_distancia_groupby['aeroporto_de_origem_nome'].to_list()
+lista_aerop_destino = df_distancia_groupby['aeroporto_de_destino_nome'].to_list()
+lista_trageto = []
+for num in range(len(lista_aerop_origem)):
+    trageto = f'{lista_aerop_origem[num]} - {lista_aerop_destino[num]}'
+    lista_trageto.append(trageto)
+
+lista_trajeto_tratada = list(set(lista_trageto))
+
+df_distancia_groupby.rename(columns={ 
+    'aeroporto_de_origem_nome': 'Aeroporto de Origem',
+    'aeroporto_de_destino_nome': 'Aeroporto de Destino',
+    'distancia_voada_km': 'Média anual de distância voada (KM)', 
+    'numero_decolagens': 'Média de decolagens anual', 
+    'horas_voadas': 'Média de horas voadas anual' }, inplace=True)
+
+
+select_trageto = st.selectbox("Selecione o trajeto", lista_trajeto_tratada)   
+
+
+if len(select_trageto) > 0:
+    nomes_separados = select_trageto.split(' - ')
+    df_filtrado = df_distancia_groupby.loc[(df_distancia_groupby['Aeroporto de Origem'] == nomes_separados[0]) & (df_distancia_groupby['Aeroporto de Destino'] == nomes_separados[1])]
+    df_filtrado['Média Total'] = df_filtrado['Média anual de distância voada (KM)'].mean().round(2)
+    df_filtrado['Análise'] = df_filtrado.apply(lambda row: 'Bom' if row['Média anual de distância voada (KM)'] >= row['Média Total'] else 'Baixo', axis=1)
+    df_filtrado = df_filtrado.round(2)
+    df_styled = df_filtrado.style.applymap(colorir_celulas2, subset=['Análise'])
+    st.write(f""" 
+            <div style="height:350px;overflow-y:scroll;"> 
+                {df_styled.to_html(escape=False)} 
+            """, unsafe_allow_html=True
+    )
+
+
+    fig = go.Figure() 
+    # Adicionar barras para total_passageiros 
+    fig.add_trace(go.Bar(x=df_filtrado['ano'], y=df_filtrado['Média anual de distância voada (KM)'], 
+                            name='Média anual de distância voada (KM)', 
+                            marker_color='blue',
+                            text=df_filtrado['Média anual de distância voada (KM)'],
+                            textposition='auto')) 
+    # Adicionar barras para passageiros_pagos 
+    fig.add_trace(go.Bar(x=df_filtrado['ano'], y=df_filtrado['decolagens'], 
+                            name='Média de decolagens anual', 
+                            marker_color='green',
+                            text=df_filtrado['decolagens'],
+                            textposition='auto')) 
+    # Adicionar barras para passageiros_gratis 
+    fig.add_trace(go.Bar(x=df_filtrado['ano'], y=df_filtrado['Média de horas voadas anual'], 
+                            name='Média de horas voadas anual', 
+                            marker_color='red',
+                            text=df_filtrado['Média de horas voadas anual'],
+                            textposition='auto'))
+    # Ajustar layout 
+    fig.update_layout( 
+        title='Gráfico dos dados relacionados as distâncias voadas por cada trageto', 
+        xaxis=dict(title='Ano'), 
+        yaxis=dict(title='Valores relacionados a distância'), 
+        barmode='group' # Agrupar barras lado a lado 
+    )
+    # Exibir o gráfico no Streamlit 
+    st.plotly_chart(fig)
+
+    """
+    ### Análise de tendência
+    Nesta análise de tendência é visto se ao longo dos anos houve um aumento ou diminuição na distância, horas voadas e quantidade de decolagens. Se os valores forem negativos quer dizer que houve diminuição na categoria e se forem positivos houve aumento.
+    """
+
+    # Identificar possíveis otimizações
+    def identificar_otimizacoes(df_filtrado):
+        df_filtrado['Tendencia das decolagens'] = df_filtrado['decolagens'].diff()
+        df_filtrado['Tendencia nas horas voadas'] = df_filtrado['Média de horas voadas anual'].diff()
+        df_filtrado['Tendencia na distância voada'] = df_filtrado['Média anual de distância voada (KM)'].diff()
+        return df_filtrado
+
+    # Aplicar a função de otimizações para cada rota
+    df_filtrado['Tendencia das decolagens'] = df_filtrado['decolagens'].diff()
+    df_filtrado['Tendencia nas horas voadas'] = df_filtrado['Média de horas voadas anual'].diff()
+    df_filtrado['Tendencia na distância voada'] = df_filtrado['Média anual de distância voada (KM)'].diff()
+    tendencias_otimizadas = df_filtrado.drop(columns=['decolagens', 'Média de horas voadas anual', 'Média anual de distância voada (KM)', 'Análise'])
+    #tendencias_otimizadas = tendencias_otimizadas.reset_index()
+    st.dataframe(tendencias_otimizadas)

@@ -51,6 +51,11 @@ def tela_principal():
         title='Análise de Temporal',
         icon=':material/whatshot:'
     )
+    analise_desempenho = st.Page(
+        page='views/analise_desempenho.py',
+        title='Análise de Desempenho',
+        icon=':material/whatshot:'
+    )
 
     pg = st.navigation(pages=[
         perfil_user, 
@@ -58,7 +63,8 @@ def tela_principal():
         analise_receita, 
         efic_operac, 
         analise_rota,
-        analise_temporal
+        analise_temporal,
+        analise_desempenho
     ])
 
     pg.run()
