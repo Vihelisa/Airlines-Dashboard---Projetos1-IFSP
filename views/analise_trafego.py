@@ -13,7 +13,7 @@ st.write("""
 Análise do número total de passageiros por rota e período de mês e ano.
 """)
 #filtrando dataframe para usar na tela
-df_trafego = df_tam[['aeroporto_de_origem_nome', 'aeroporto_de_destino_nome', 'mes', 'ano', 'passageiros_pagos', 'passageiros_gratis']]
+df_trafego = df_tam[['aeroporto_de_origem_nome', 'aeroporto_de_destino_nome', 'mes', 'ano', 'passageiros_pagos', 'passageiros_gratis', 'assentos', 'decolagens']]
 df_trafego.loc[:, 'total_passageiros'] = df_trafego['passageiros_pagos'] + df_trafego['passageiros_gratis']
 df_trafego['total_passageiros'] = df_trafego['total_passageiros'].astype(int)
 
@@ -50,20 +50,28 @@ def colorir_celulas(val):
     color = 'green' if val == 'Bom' else 'red' 
     return f'background-color: {color}'
 
+# Definir a função para determinar a mensagem 
+def determinar_mensagem(row): 
+    if row['analise_de_frequencia'] == 'ruim': return 'Analise a lucratividade para saber se vale a pena continuar com a rota ou faça promoções para aumentar o interesse dos viajantes'
+    else: 
+        try:
+            media_passageiros = row['total_passageiros'] / row['decolagens'] 
+            media_assentos = row['assentos'] / 2 
+            if media_passageiros >= media_assentos: return 'Aumentar numero de viagens para esta rota' 
+            else: return 'Otimização não identificada'
+        except:
+            return 'Otimização não identificada'
+
 if 'Todos' in select_trageto:
     if 'Todos' in select_ano:
         df_traf_todos = df_trafego.groupby(['aeroporto_de_origem_nome', 'aeroporto_de_destino_nome']).sum().reset_index()
         df_traf_all_filtered = df_traf_todos.drop(columns=['mes', 'ano'])
         df_traf_all_filtered['parametro'] = info_num
         df_traf_all_filtered['analise_de_frequencia'] = df_traf_all_filtered.apply(lambda row: 'Bom' if row['total_passageiros'] >= row['parametro'] else 'Baixo', axis=1)
+        df_traf_all_filtered['possiveis_otimizacoes'] = df_traf_all_filtered.apply(determinar_mensagem, axis=1)
         df_styled = df_traf_all_filtered.style.applymap(colorir_celulas, subset=['analise_de_frequencia'])
-        #st.dataframe(df_styled.data)
         # Exibir o DataFrame estilizado com rolagem no Streamlit 
-        st.write(f""" 
-                <div style="height:500px;overflow-y:scroll;"> 
-                    {df_styled.to_html(escape=False)} 
-                """, unsafe_allow_html=True
-        )
+        st.dataframe(df_styled, use_container_width=True)
 
         # Encontrar as linhas com o valor mais alto e mais baixo na coluna 'total_passageiros'
         linha_valor_mais_alto = df_traf_all_filtered.loc[df_traf_all_filtered['total_passageiros'].idxmax()] 
@@ -164,13 +172,10 @@ if 'Todos' in select_trageto:
         df_traf_all_filtered = df_traf_todos[df_traf_todos['ano'].isin(select_ano)]
         df_traf_all_filtered['parametro'] = info_num
         df_traf_all_filtered['analise_de_frequencia'] = df_traf_all_filtered.apply(lambda row: 'Bom' if row['total_passageiros'] >= row['parametro'] else 'Baixo', axis=1)
+        df_traf_all_filtered['possiveis_otimizacoes'] = df_traf_all_filtered.apply(determinar_mensagem, axis=1)
         df_styled = df_traf_all_filtered.style.applymap(colorir_celulas, subset=['analise_de_frequencia'])
         # Exibir o DataFrame estilizado com rolagem no Streamlit 
-        st.write(f""" 
-                <div style="height:500px;overflow-y:scroll;"> 
-                    {df_styled.to_html(escape=False)} 
-                """, unsafe_allow_html=True
-        )
+        st.dataframe(df_styled, use_container_width=True)
 
         # Encontrar as linhas com o valor mais alto e mais baixo na coluna 'total_passageiros'
         linha_valor_mais_alto = df_traf_all_filtered.loc[df_traf_all_filtered['total_passageiros'].idxmax()] 
@@ -282,13 +287,11 @@ elif len(select_trageto) > 0:
         df_traf_all_filtered = df_traf_todos.drop(columns=['mes', 'ano'])
         df_traf_all_filtered['parametro'] = info_num
         df_traf_all_filtered['analise_de_frequencia'] = df_traf_all_filtered.apply(lambda row: 'Bom' if row['total_passageiros'] >= row['parametro'] else 'Baixo', axis=1)
+        df_traf_all_filtered['possiveis_otimizacoes'] = df_traf_all_filtered.apply(determinar_mensagem, axis=1)
         df_styled = df_traf_all_filtered.style.applymap(colorir_celulas, subset=['analise_de_frequencia'])
         # Exibir o DataFrame estilizado com rolagem no Streamlit 
-        st.write(f""" 
-                <div style="height:500px;overflow-y:scroll;"> 
-                    {df_styled.to_html(escape=False)} 
-                """, unsafe_allow_html=True
-        )
+        st.dataframe(df_styled, use_container_width=True)
+
         # Encontrar as linhas com o valor mais alto e mais baixo na coluna 'total_passageiros'
         linha_valor_mais_alto = df_traf_all_filtered.loc[df_traf_all_filtered['total_passageiros'].idxmax()] 
         linha_valor_mais_baixo = df_traf_all_filtered.loc[df_traf_all_filtered['total_passageiros'].idxmin()]
@@ -387,13 +390,10 @@ elif len(select_trageto) > 0:
         df_traf_all_filtered = df_traf_todos[df_traf_todos['ano'].isin(select_ano)]
         df_traf_all_filtered['parametro'] = info_num
         df_traf_all_filtered['analise_de_frequencia'] = df_traf_all_filtered.apply(lambda row: 'Bom' if row['total_passageiros'] >= row['parametro'] else 'Baixo', axis=1)
+        df_traf_all_filtered['possiveis_otimizacoes'] = df_traf_all_filtered.apply(determinar_mensagem, axis=1)
         df_styled = df_traf_all_filtered.style.applymap(colorir_celulas, subset=['analise_de_frequencia'])
         # Exibir o DataFrame estilizado com rolagem no Streamlit 
-        st.write(f""" 
-                <div style="height:500px;overflow-y:scroll;"> 
-                    {df_styled.to_html(escape=False)} 
-                """, unsafe_allow_html=True
-        )
+        st.dataframe(df_styled, use_container_width=True)
     
         # Encontrar as linhas com o valor mais alto e mais baixo na coluna 'total_passageiros'
         linha_valor_mais_alto = df_traf_all_filtered.loc[df_traf_all_filtered['total_passageiros'].idxmax()] 

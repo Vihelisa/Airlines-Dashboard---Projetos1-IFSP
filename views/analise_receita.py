@@ -26,11 +26,7 @@ df_lucratividade = df_lucratividade.drop(columns=['mes'])
 df_styled = df_lucratividade.style.applymap(colorir_celulas, subset=['lucratividade'])
 #st.dataframe(df_styled.data)
 # Exibir o DataFrame estilizado com rolagem no Streamlit 
-st.write(f""" 
-        <div style="height:500px;overflow-y:scroll;"> 
-            {df_styled.to_html(escape=False)} 
-        """, unsafe_allow_html=True
-)
+st.dataframe(df_styled, use_container_width=True)
 
 
 # Selecionar ano 

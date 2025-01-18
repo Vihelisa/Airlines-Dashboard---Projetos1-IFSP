@@ -51,11 +51,8 @@ if len(select_trageto) > 0:
     df_filtrado['Análise'] = df_filtrado.apply(lambda row: 'Bom' if row['Média anual de distância voada (KM)'] >= row['Média Total'] else 'Baixo', axis=1)
     df_filtrado = df_filtrado.round(2)
     df_styled = df_filtrado.style.applymap(colorir_celulas2, subset=['Análise'])
-    st.write(f""" 
-            <div style="height:350px;overflow-y:scroll;"> 
-                {df_styled.to_html(escape=False)} 
-            """, unsafe_allow_html=True
-    )
+    st.dataframe(df_styled, use_container_width=True)
+
 
 
     fig = go.Figure() 
