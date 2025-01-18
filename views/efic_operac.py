@@ -8,6 +8,7 @@ from config.consulta import *
 from functions.functions import fetch_user_info
 import plotly.express as px
 from principal import df_tam
+from functions.functions import *
 
 
 df_tam = df_rotas
@@ -18,7 +19,6 @@ st.title("Análise de Eficiência Operacional")
 
 # Filtrando e renomeando as colunas necessárias
 colunas_necessarias = {
-    'id_empresa': 'Id Empresa',
     'aeroporto_de_origem_nome': 'Nome Origem',
     'aeroporto_de_origem_uf': 'UF Origem',
     'aeroporto_de_origem_pais': 'País Origem',
@@ -31,7 +31,8 @@ colunas_necessarias = {
     'assentos': 'Assentos Disponíveis',
     'assentos_vazios': 'Assentos Vazios',
     'porcentagem': '% Ocupação',
-    'resultado_ocupacao': 'Eficiência'
+    'resultado_ocupacao': 'Eficiência',
+    'plano_de_acao': 'Plano de Ação'
 }
 
 # Garantindo que todas as colunas existam no DataFrame
@@ -123,6 +124,8 @@ if filtro_eficiencia != "Todos":
     df_rotas = df_rotas[df_rotas['resultado_ocupacao'] == filtro_eficiencia]
 if filtro_mes != "Todos":
     df_rotas = df_rotas[df_rotas['mes'] == filtro_mes]
+
+df_rotas['plano_de_acao'] = df_rotas['resultado_ocupacao'].apply(gerar_plano_acao_eficiencia)
 
 # Filtrando e renomeando as colunas
 df_tabela = df_rotas[list(colunas_necessarias.keys())].rename(columns=colunas_necessarias)

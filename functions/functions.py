@@ -156,3 +156,31 @@ def colorir_tags(row):
         return f"<span style='color:green'>{row['Status']}</span>" 
     else: 
         return f"<span style='color:red'>{row['Status']}</span>"
+    
+
+def gerar_plano_acao_eficiencia(eficiencia):
+    if eficiencia == "Péssima":
+        return "Revisar rotas e custos."
+    elif eficiencia == "Ruim":
+        return "Aumentar ocupação com promoções."
+    elif eficiencia == "Boa":
+        return "Monitorar desempenho atual."
+    elif eficiencia == "Excelente":
+        return "Manter estratégia eficiente."
+    else:
+        return "Sem dados suficientes."
+    
+
+
+def gerar_plano_acao_desgaste(desgaste):
+    if desgaste == "Baixo":
+        return "Manter operação consistente."
+    elif desgaste == "Médio":
+        return "Avaliar aumento da carga operacional."
+    elif desgaste == "Alto":
+        return "Planejar manutenção preventiva."
+    elif desgaste == "Extremo":
+        return "Interromper rota para revisão."
+    else:
+        return "Sem dados suficientes."
+    

@@ -63,6 +63,7 @@ def estilo_desgaste(val):
     return ""
 
 df_agrupado['Nível de Desgaste'] = df_agrupado['Total de Horas Voadas'].apply(classificar_desgaste)
+df_agrupado['Plano de Ação'] = df_agrupado['Nível de Desgaste'].apply(gerar_plano_acao_desgaste)
 
 # Filtros
 st.subheader("Filtros")
