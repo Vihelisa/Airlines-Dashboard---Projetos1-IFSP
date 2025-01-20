@@ -13,11 +13,11 @@ from sqlalchemy import create_engine, Table, MetaData
 from config.consulta import *
 
 
-SQLSession = connect_to_db_leo("dashboard", "postgres", "root", "localhost")
+SQLSession = connect_to_db_leo("dashboard", "postgres", "1234", "localhost")
 
 
 def bd_conect():
-    engine = connect_to_db("dashboard", "postgres", "root", "localhost")
+    engine = connect_to_db("dashboard", "admin", "admin", "localhost")
     # Definir o schema da tabela (sem criar, apenas referenciando) 
     metadata = MetaData(bind=engine) 
     db_session = Table('funcionario', metadata, autoload_with=engine)
@@ -51,13 +51,15 @@ def fetch_user_info(user_id):
     """Recupera informações do usuário a partir do banco de dados."""
     try:
         db_session = SQLSession()
-        query = text("""
-            SELECT nome, email, cargo, empresa_nome, id_empresa 
-            FROM funcionario 
-            WHERE idfunc = :user_id
-        """)
-        result = db_session.execute(query, {"user_id": user_id}).fetchone()
-        db_session.close()
+
+        # Usar a conexão da sessão
+        with db_session.connection() as connection:
+            query = text("""
+                SELECT nome, email, cargo, empresa_nome, id_empresa 
+                FROM funcionario 
+                WHERE id_func = :user_id
+            """)
+            result = connection.execute(query, {"user_id": user_id}).fetchone()
 
         if result:
             return {
@@ -72,6 +74,7 @@ def fetch_user_info(user_id):
     except Exception as e:
         print(f"Erro ao buscar informações do usuário: {e}")
         return None
+
     
 
     # Criando função para estilizar as células com base na eficiência
@@ -130,7 +133,7 @@ def gerar_plano_acao_desgaste(desgaste):
 def validate_user(email, password):
     try:
         db_session = SQLSession()
-        query = text("SELECT idfunc, email, senha FROM funcionario WHERE email = :email")
+        query = text("SELECT id_func, email, senha FROM funcionario WHERE email = :email")
         result = db_session.execute(query, {"email": email}).fetchone()
         db_session.close()
 
@@ -152,9 +155,9 @@ def atualizar_senha_bd(user_id, nova_senha):
     try:
         db_session = SQLSession()
         hashed_password = generate_password_hash(nova_senha, method='pbkdf2:sha256', salt_length=8)
-        query = text("UPDATE funcionario SET senha = :senha WHERE idfunc = :user_id")
+        query = text("UPDATE funcionario SET senha = :senha WHERE id_func = :user_id")
         db_session.execute(query, {"senha": hashed_password, "user_id": user_id})
-        db_session.commit()
+        db_session.commit() 
         db_session.close()
         return True
     except Exception as e:
@@ -208,14 +211,12 @@ def send_email(to_email, password):
         st.error(f"Erro ao enviar email: {e}")
 
     
-def filter_empty_data(select_trafego, select_mes, select_ano):
+def filter_empty_data(select_trafego, select_ano):
     if not select_trafego:
         select_trafego = 'Todos'
-    if not select_mes:
-        select_mes = 'Todos'
     if not select_ano:
         select_ano = 'Todos'
-    return select_trafego, select_mes, select_ano
+    return select_trafego, select_ano
 
 
 
@@ -250,3 +251,11 @@ def multiselect_mes_ano_option(df_trafego, select_mes, select_ano):
         df_graph = df_traf_todos[df_traf_todos['mes'].isin(select_mes)]
         df_graph = df_traf_todos[df_traf_todos['ano'].isin(select_ano)]
         return df_graph
+    
+
+#fazendo a conexão com o banco de dados
+def get_dataframe():
+    df_funcionario, df_empresa, df_rotas = get_query()
+    id_empresa = df_funcionario.loc[df_funcionario['email'] == st.session_state.user_email, 'id_empresa'][0]
+    df_emp_filtro = df_rotas.loc[df_rotas['id_empresa']==id_empresa]
+    return df_empresa, df_funcionario, df_emp_filtro

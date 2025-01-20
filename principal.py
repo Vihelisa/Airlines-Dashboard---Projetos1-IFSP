@@ -6,15 +6,6 @@ from config.consulta import *
 from functions.functions import *
 
 
-#fazendo a conexão com o banco de dados
-#df_funcionario, df_empresa, df_rotas = get_query()
-
-#filtrando a tabela de rotas para apenas a empresa TAM com id 3
-#df_tam = df_rotas.loc[df_rotas['id_empresa']==3] #Só pq ainda nn tem sistema de login do usuário
-
-
-
-
 # Opções de navegação 
 
 def tela_principal():

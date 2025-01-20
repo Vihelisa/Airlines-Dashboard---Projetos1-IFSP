@@ -4,20 +4,21 @@ import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy import text
+
 
 
 
 # Função para conectar ao banco de dados
-def connect_to_db(database, user, password, host):
-    try:
-        # Criar a URI de conexão
-        connection_string = f'postgresql+psycopg2://{user}:{password}@{host}/{database}'
-        # Criar o engine de conexão
-        engine = create_engine(connection_string)
-        return engine
-    except Exception as e:
-        print(f"Erro ao conectar ao banco de dados:\n{e}")
-        return None
+def connect_to_db(): 
+    try: 
+        # Conectar ao banco de dados 
+        conn = psycopg2.connect( dbname='dashboard', user='admin', password='admin', host='localhost' ) 
+        print("Conexão bem-sucedida!") 
+        return conn 
+    except Exception as e: 
+        print(f"Erro ao conectar ao banco de dados: {e}") 
+    return None
     
 
 def connect_to_db_leo(database, user, password, host):
@@ -30,25 +31,25 @@ def connect_to_db_leo(database, user, password, host):
 
         return SQLSession  # Retorna apenas o sessionmaker
     except Exception as e:
-        print(f"Erro ao conectar! Detalhes: {e}")
+        print(f"Erro ao conectar no connect_to_db! Detalhes: {e}")
         return None
 
 #teste
 
-def get_data(query):
-    with open('config/login_bd_leo.json') as file:
-        login = json.load(file)
-    try:
-        # Conectar ao banco de dados 
-        engine = connect_to_db(login["database"], login['user'], login['password'], "localhost")
-        try: 
-            df = pd.read_sql_query(query, engine) 
-            return df 
-        except SQLAlchemyError as e: 
+def get_data(query): 
+    with open('config/login_bd.json') as file: 
+        login = json.load(file) 
+        try: # Conectar ao banco de dados 
+            conn = connect_to_db() 
+            if conn is not None: 
+                df = pd.read_sql_query(query, conn) 
+                conn.close() 
+                return df 
+            else: return None 
+        except Exception as e: 
             print(f"Erro ao executar a consulta: {e}") 
-            return None   
-    except:
-        print(f"Erro ao conectar!")
+            return None
+
 
 def get_data_leo(query):
     with open('config/login_bd_leo.json', encoding='utf-8') as file:
@@ -62,38 +63,35 @@ def get_data_leo(query):
 
         # Criar uma sessão e obter o engine associado
         session = SQLSession()
-        engine = session.bind  # O `engine` está associado ao sessionmaker
 
         try:
-            # Consultar o banco de dados
-            df = pd.read_sql_query(query, engine)
-            return df
+            # Usar a conexão do session para executar a query
+            with session.connection() as connection:
+                # Certificar-se de que a query está no formato executável
+                sql_query = text(query)
+                df = pd.read_sql_query(sql_query, con=connection)
+                return df
         except SQLAlchemyError as e:
             print(f"Erro ao executar a consulta: {e}")
             return None
         finally:
             session.close()  # Certifique-se de fechar a sessão
     except Exception as e:
-        print(f"Erro ao conectar! Detalhes: {e}")
+        print(f"Erro ao conectar no get_data_leo! Detalhes: {e}")
         return None
+
+
 
     
 
-
-def close_conection(conexao, cursor):
-    # Fechar a conexão 
-    cursor.close() 
-    conexao.close()
-
-
-def get_query():
-    with open('config/query.json') as file:
-        query = json.load(file)
-
-    df_funcionario = get_data(query['funcionario'])
-    df_empresa = get_data(query['empresa'])
-    df_rotas = get_data(query['rotas'])
+def get_query(): 
+    with open('config/query.json') as file: 
+        query = json.load(file) 
+    df_funcionario = get_data(query['funcionario']) 
+    df_empresa = get_data(query['empresa']) 
+    df_rotas = get_data(query['rotas']) 
     return df_funcionario, df_empresa, df_rotas
+
 
 def get_query_leo():
     with open('config/query.json') as file:
