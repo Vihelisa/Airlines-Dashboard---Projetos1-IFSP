@@ -1,12 +1,13 @@
 import streamlit as st
 import streamlit_antd_components as sac
 from views.perfil_user import *
-from views.tela_alterar_senha import *
+from tela_alterar_senha import *
 from config.consulta import *
 from functions.functions import *
 
 
 # Opções de navegação 
+# Função para navegar entre as páginas 
 
 def tela_principal():
     load_css("static/principal.css")
@@ -60,5 +61,6 @@ def tela_principal():
         analise_desempeho
     ])
 
+    
     pg.run()
     

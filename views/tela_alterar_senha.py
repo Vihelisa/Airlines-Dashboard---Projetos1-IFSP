@@ -3,6 +3,14 @@ from functions.functions import *
 
 def tela_alterar_senha():
     """Tela dedicada para alteração de senha."""
+    hide_sidebar = """
+            <style>
+                [data-testid="stSidebar"] {
+                    display: none;
+                }
+            </style>
+        """
+    st.markdown(hide_sidebar, unsafe_allow_html=True)    
     st.title("Alterar Senha")
 
     # Verifica se o usuário está logado
@@ -33,5 +41,5 @@ def tela_alterar_senha():
                 else:
                     st.error("Erro ao alterar a senha. Tente novamente.")
 
-    if st.button("Voltar"):
-        st.session_state.page = 'principal'  
+
+    st.button("Voltar", on_click=lambda: change_page('principal'))

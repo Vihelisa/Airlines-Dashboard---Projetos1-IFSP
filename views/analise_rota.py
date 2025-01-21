@@ -13,6 +13,11 @@ def colorir_celulas2(val):
     color = 'green' if val == 'Bom' else 'red' 
     return f'background-color: {color}'
 
+def determinar_mensagem(row): 
+    if row['Análise'] == 'Baixo': return 'Analisar possibilidade de compartilhamento de passageiros e otimizar rotas'
+    else: 
+        return 'Visar rotas mais diretas otimizar planejamento de voos reduzir consumo de combustível'
+
 
 df_funcionario, df_empresa, df_rotas = get_query()
 df_id_empresa = df_funcionario.loc[df_funcionario['email'] == st.session_state.user_email, 'id_empresa'].reset_index()
@@ -57,6 +62,7 @@ if len(select_trageto) > 0:
     df_filtrado = df_distancia_groupby.loc[(df_distancia_groupby['Aeroporto de Origem'] == nomes_separados[0]) & (df_distancia_groupby['Aeroporto de Destino'] == nomes_separados[1])]
     df_filtrado['Média Total'] = df_filtrado['Média anual de distância voada (KM)'].mean().round(2)
     df_filtrado['Análise'] = df_filtrado.apply(lambda row: 'Alto' if row['Média anual de distância voada (KM)'] >= row['Média Total'] else 'Baixo', axis=1)
+    df_filtrado['Possíveis Otimizações'] = df_filtrado.apply(determinar_mensagem, axis=1)
     df_filtrado = df_filtrado.round(2)
     df_styled = df_filtrado.style.applymap(colorir_celulas, subset=['Análise'])
     st.dataframe(df_styled, use_container_width=True)

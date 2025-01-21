@@ -25,13 +25,13 @@ df_trafego = df_emp_filtro[['aeroporto_de_origem_nome', 'aeroporto_de_destino_no
 df_trafego.loc[:, 'total_passageiros'] = df_trafego['passageiros_pagos'] + df_trafego['passageiros_gratis']
 df_trafego['total_passageiros'] = df_trafego['total_passageiros'].astype(int)
 
-#Criando lista de tragetos para o multiselect de tragetos 
+#Criando lista de trajetos para o multiselect de trajetos 
 lista_aerop_origem = df_trafego['aeroporto_de_origem_nome'].to_list()
 lista_aerop_destino = df_trafego['aeroporto_de_destino_nome'].to_list()
-lista_trageto = ['Todos']
+lista_trajeto = ['Todos']
 for num in range(len(lista_aerop_origem)):
-    trageto = f'{lista_aerop_origem[num]} - {lista_aerop_destino[num]}'
-    lista_trageto.append(trageto)
+    trajeto = f'{lista_aerop_origem[num]} - {lista_aerop_destino[num]}'
+    lista_trajeto.append(trajeto)
 
 #Filtrando e criando lista para o multiselect de mes e ano
 todos = ['Todos']
@@ -45,13 +45,13 @@ col1, col2, col3 = st.columns(3)
 
 # Adicionar os widgets multiselect em colunas separadas 
 with col1: 
-    select_trageto = st.multiselect("Selecione o trajeto", lista_trageto)
+    select_trajeto = st.multiselect("Selecione o trajeto", lista_trajeto)
 with col2: 
     select_ano = st.multiselect("Selecione o ano", lista_ano)
 with col3:
     info_num = st.number_input('Insira um número inteiro como parâmetro de comparação: ', step=1)
 
-select_trafego, select_ano = filter_empty_data(select_trageto, select_ano)
+select_trafego, select_ano = filter_empty_data(select_trajeto, select_ano)
 
 # Função para colorir as células 
 def colorir_celulas(val): 
@@ -70,7 +70,7 @@ def determinar_mensagem(row):
         except:
             return 'Otimização não identificada'
 
-if 'Todos' in select_trageto:
+if 'Todos' in select_trajeto:
     if 'Todos' in select_ano:
         df_traf_todos = df_trafego.groupby(['aeroporto_de_origem_nome', 'aeroporto_de_destino_nome']).sum().reset_index()
         df_traf_all_filtered = df_traf_todos.drop(columns=['mes', 'ano'])
@@ -98,7 +98,7 @@ if 'Todos' in select_trageto:
         st.write("")
         st.write("")
         st.write("""
-        Estes sãos os trajetos com a maior e a menos frequencia de passageiros relacionados a todos os anos analisados. Considere que o maior valor foi o trajeto mais procurado e o menor o de menos interesse dos viajantes.
+        Estes sãos os trajetos com a maior e a menor frequencia de passageiros relacionados a todos os anos analisados. Considere que o maior valor foi o trajeto mais procurado e o menor o de menos interesse dos viajantes.
         """)
 
 
@@ -129,7 +129,7 @@ if 'Todos' in select_trageto:
                              textposition='auto'))
         # Ajustar layout 
         fig.update_layout( 
-            title='Gráfico de Total Passageiros, Passageiros Pagos e Passageiros Grátis por Ano para o trageto com a maior análise', 
+            title='Gráfico de Total Passageiros, Passageiros Pagos e Passageiros Grátis por Ano para o trajeto com a maior análise', 
             xaxis=dict(title='Ano'), 
             yaxis=dict(title='Quantidade de Passageiros'), 
             barmode='group' # Agrupar barras lado a lado 
@@ -165,7 +165,7 @@ if 'Todos' in select_trageto:
                              textposition='auto'))
         # Ajustar layout 
         fig.update_layout( 
-            title='Gráfico de Total Passageiros, Passageiros Pagos e Passageiros Grátis por Ano para o trageto com a maior análise', 
+            title='Gráfico de Total Passageiros, Passageiros Pagos e Passageiros Grátis por Ano para o trajeto com a maior análise', 
             xaxis=dict(title='Ano'), 
             yaxis=dict(title='Quantidade de Passageiros'), 
             barmode='group' # Agrupar barras lado a lado 
@@ -233,7 +233,7 @@ if 'Todos' in select_trageto:
                              textposition='auto'))
         # Ajustar layout 
         fig.update_layout( 
-            title='Gráfico de Total Passageiros, Passageiros Pagos e Passageiros Grátis por Ano para o trageto com a maior análise', 
+            title='Gráfico de Total Passageiros, Passageiros Pagos e Passageiros Grátis por Ano para o trajeto com a maior análise', 
             xaxis=dict(title='Ano'), 
             yaxis=dict(title='Quantidade de Passageiros'), 
             barmode='group' # Agrupar barras lado a lado 
@@ -269,7 +269,7 @@ if 'Todos' in select_trageto:
                              textposition='auto'))
         # Ajustar layout 
         fig.update_layout( 
-            title='Gráfico de Total Passageiros, Passageiros Pagos e Passageiros Grátis por Ano para o trageto com a maior análise', 
+            title='Gráfico de Total Passageiros, Passageiros Pagos e Passageiros Grátis por Ano para o trajeto com a maior análise', 
             xaxis=dict(title='Ano'), 
             yaxis=dict(title='Quantidade de Passageiros'), 
             barmode='group' # Agrupar barras lado a lado 
@@ -277,9 +277,9 @@ if 'Todos' in select_trageto:
         # Exibir o gráfico no Streamlit 
         st.plotly_chart(fig)
 
-elif len(select_trageto) > 0:
+elif len(select_trajeto) > 0:
     lista_df_filtrado = []
-    nomes_separados = [nome for sublista in select_trageto for nome in sublista.split('-')]
+    nomes_separados = [nome for sublista in select_trajeto for nome in sublista.split('-')]
     for num in range(len(nomes_separados)):
         if num%2 == 0:
             origem = nomes_separados[num].strip()
@@ -348,7 +348,7 @@ elif len(select_trageto) > 0:
                              textposition='auto'))
         # Ajustar layout 
         fig1.update_layout( 
-            title='Gráfico de Total Passageiros, Passageiros Pagos e Passageiros Grátis por Ano para o trageto com a maior análise', 
+            title='Gráfico de Total Passageiros, Passageiros Pagos e Passageiros Grátis por Ano para o trajeto com a maior análise', 
             xaxis=dict(title='Ano'), 
             yaxis=dict(title='Quantidade de Passageiros'), 
             barmode='group' # Agrupar barras lado a lado 
@@ -384,7 +384,7 @@ elif len(select_trageto) > 0:
                              textposition='auto'))
         # Ajustar layout 
         fig2.update_layout( 
-            title='Gráfico de Total Passageiros, Passageiros Pagos e Passageiros Grátis por Ano para o trageto com a maior análise', 
+            title='Gráfico de Total Passageiros, Passageiros Pagos e Passageiros Grátis por Ano para o trajeto com a maior análise', 
             xaxis=dict(title='Ano'), 
             yaxis=dict(title='Quantidade de Passageiros'), 
             barmode='group' # Agrupar barras lado a lado 
@@ -451,7 +451,7 @@ elif len(select_trageto) > 0:
                              textposition='auto'))
         # Ajustar layout 
         fig.update_layout( 
-            title='Gráfico de Total Passageiros, Passageiros Pagos e Passageiros Grátis por Ano para o trageto com a maior análise', 
+            title='Gráfico de Total Passageiros, Passageiros Pagos e Passageiros Grátis por Ano para o trajeto com a maior análise', 
             xaxis=dict(title='Ano'), 
             yaxis=dict(title='Quantidade de Passageiros'), 
             barmode='group' # Agrupar barras lado a lado 
@@ -487,7 +487,7 @@ elif len(select_trageto) > 0:
                              textposition='auto'))
         # Ajustar layout 
         fig.update_layout( 
-            title='Gráfico de Total Passageiros, Passageiros Pagos e Passageiros Grátis por Ano para o trageto com a maior análise', 
+            title='Gráfico de Total Passageiros, Passageiros Pagos e Passageiros Grátis por Ano para o trajeto com a maior análise', 
             xaxis=dict(title='Ano'), 
             yaxis=dict(title='Quantidade de Passageiros'), 
             barmode='group' # Agrupar barras lado a lado 

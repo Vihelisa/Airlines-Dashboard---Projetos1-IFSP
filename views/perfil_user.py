@@ -36,10 +36,8 @@ def tela_perfil_user():
         st.write(f"**Empresa:** {user_info['empresa']}")
 
     # Botões de ação
-    if st.button("Alterar Senha"):
-        st.session_state.page = 'alterar_senha'
-    if st.button("Sair"):
-        st.session_state.logged_in = False
-        st.session_state.page = 'login'
+    st.button("Alterar Senha", on_click=lambda: change_page('alterar_senha'))
+
+    st.button("Sair", on_click=lambda: change_page('login'))
 
 tela_perfil_user()
