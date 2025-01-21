@@ -6,7 +6,7 @@ from create_user import *
 from principal import *
 from functions.functions import *
 from config.consulta import *
-
+from views.tela_alterar_senha import *
 
 
 

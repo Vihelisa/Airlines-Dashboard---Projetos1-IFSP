@@ -1,6 +1,6 @@
 /* static/principal.css */
 [data-testid="stSidebar"] {
-    background-color: #1B2A49; /* Cor de fundo azul escuro */
+    background-color: #2e4573; /* Cor de fundo azul escuro */
     color: white; /* Cor do texto */
     transition: width 0.2s;
     overflow-x: hidden;
@@ -12,3 +12,4 @@
     color: white; /* Cor das letras */
     size: 20px;
 }
+

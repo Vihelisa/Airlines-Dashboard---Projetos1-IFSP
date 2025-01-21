@@ -37,7 +37,6 @@ def tela_perfil_user():
 
     # Botões de ação
     st.button("Alterar Senha", on_click=lambda: change_page('alterar_senha'))
-
-    st.button("Sair", on_click=lambda: change_page('login'))
+    
 
 tela_perfil_user()

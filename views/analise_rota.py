@@ -60,7 +60,7 @@ select_trageto = st.selectbox("Selecione o trajeto", lista_trajeto_tratada)
 if len(select_trageto) > 0:
     nomes_separados = select_trageto.split(' - ')
     df_filtrado = df_distancia_groupby.loc[(df_distancia_groupby['Aeroporto de Origem'] == nomes_separados[0]) & (df_distancia_groupby['Aeroporto de Destino'] == nomes_separados[1])]
-    df_filtrado['Média Total'] = df_filtrado['Média anual de distância voada (KM)'].mean().round(2)
+    df_filtrado['Média Total'] = df_filtrado['Média anual de distância voada (KM)'].mean() #.round(2)
     df_filtrado['Análise'] = df_filtrado.apply(lambda row: 'Alto' if row['Média anual de distância voada (KM)'] >= row['Média Total'] else 'Baixo', axis=1)
     df_filtrado['Possíveis Otimizações'] = df_filtrado.apply(determinar_mensagem, axis=1)
     df_filtrado = df_filtrado.round(2)

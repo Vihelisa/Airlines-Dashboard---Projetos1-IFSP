@@ -60,13 +60,13 @@ def colorir_celulas(val):
 
 # Definir a função para determinar a mensagem 
 def determinar_mensagem(row): 
-    if row['analise_de_frequencia'] == 'ruim': return 'Analise a lucratividade para saber se vale a pena continuar com a rota ou faça promoções para aumentar o interesse dos viajantes'
+    if row['analise_de_frequencia'] == 'Baixo': return 'Analisar continuidade do trajeto em catálogo'
     else: 
         try:
             media_passageiros = row['total_passageiros'] / row['decolagens'] 
             media_assentos = row['assentos'] / 2 
             if media_passageiros >= media_assentos: return 'Aumentar numero de viagens para esta rota' 
-            else: return 'Otimização não identificada'
+            else: return 'Oferecer promoções para aumento de interesse'
         except:
             return 'Otimização não identificada'
 
@@ -494,3 +494,4 @@ elif len(select_trajeto) > 0:
         )
         # Exibir o gráfico no Streamlit 
         st.plotly_chart(fig, key='grafico2')
+
